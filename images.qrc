@@ -40,6 +40,5 @@
         <file>images/background.png</file>
         <file>images/about.png</file>
         <file>images/cat.png</file>
-        <file>images/全屏.png</file>
     </qresource>
 </RCC>

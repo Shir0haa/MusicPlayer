@@ -53,7 +53,7 @@ ToolBar{
             height: 32
         }
         ToolButton{
-            icon.source: "qrc:/images/全屏"
+            icon.source: "qrc:/images/full-screen"
             width: 32
             height: 32
         }
