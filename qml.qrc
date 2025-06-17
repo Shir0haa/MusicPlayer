@@ -14,5 +14,6 @@
         <file>DetailFavoritePageView.qml</file>
         <file>DetailPlayListPageView.qml</file>
         <file>MusicListView.qml</file>
+        <file>MusicTextButton.qml</file>
     </qresource>
 </RCC>

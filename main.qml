@@ -14,6 +14,8 @@ Window {
     visible: true
     title: qsTr("鸟白岛音乐播放器")
 
+
+
     ColumnLayout{
         anchors.fill: parent
         //添加顶部工具栏

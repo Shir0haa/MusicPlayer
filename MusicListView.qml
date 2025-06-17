@@ -34,6 +34,7 @@ Frame{
         color: "#00000000"
     }
 
+
     ListView{
         id:listView
         anchors.fill: parent
@@ -47,10 +48,11 @@ Frame{
         }
         header: listViewHeader
         highlight:Rectangle{
-            color: "#20f0f0f0"
+            color: "blue"
         }
         highlightMoveDuration: 0
         highlightResizeDuration: 0
+
     }
 
 
@@ -63,7 +65,7 @@ Frame{
             id:listViewDelegateItem
             height: 45
             width: listView.width
-            color: "#00000000"
+            color: "#80CCCCCC"
 
             Shape{
                 anchors.fill: parent
@@ -78,13 +80,20 @@ Frame{
                         y:45
                     }
                     PathLine{
-                        x:parent.width
                         y:45
                     }
                 }
             }//在列表项底部绘制一条分隔线
 
+            property bool hovered: false
+
             MouseArea{
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor  //鼠标悬停时显示为手型
+                onEntered: hovered = true
+                onExited: hovered = false
+
                 RowLayout{
                     width: parent.width
                     height: parent.height
@@ -143,15 +152,14 @@ Frame{
                                 iconWidth: 16
                                 toolTip: "喜欢"
                                 onClicked: {
-                                    //喜欢
                                     layoutBottomView.saveFavorite({
-                                                                      id:musicList[index].id,
-                                                                      name:musicList[index].name,
-                                                                      artist:musicList[index].artist,
-                                                                      url:musicList[index].url?musicList[index].url:"",
-                                                                      album:musicList[index].album,
-                                                                      type:musicList[index].type?musicList[index].type:"0"
-                                                                  })
+                                        id: model.id,
+                                        name: model.name,
+                                        artist: model.artist,
+                                        url: model.url,
+                                        album: model.album,
+                                        type: model.type
+                                    })
                                 }
                             }
                             MusicIconButton{
@@ -166,19 +174,9 @@ Frame{
                     }
                 }
 
-                anchors.fill:parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onEntered: {
-                    color = "#20f0f0f0"
-                }                                  // 悬停时半透明灰色背景
-                onExited: {
-                    color = "#00000000"
-                }
                 onClicked: {
                     listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
                 }
-
 
             }
         }
@@ -206,7 +204,6 @@ Frame{
                 Text{
                     text:"歌名"
                     Layout.preferredWidth: parent.width*0.4
-                    font.family: window.mFONT_FAMILY
                     font.pointSize: 13
                     color: "#eeffffff"
                     elide: Qt.ElideRight
