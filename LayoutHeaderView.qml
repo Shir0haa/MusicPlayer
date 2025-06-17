@@ -5,7 +5,7 @@ import QtQuick.Layouts
 
 ToolBar{
     background: Rectangle{
-        color: "red"
+        color: "#00AAAA"
     }
 
     width: parent.width

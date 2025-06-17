@@ -6,7 +6,7 @@ import QtQuick.Layouts
 Rectangle{
     Layout.fillWidth: true
     height: 60
-    color: "green"
+    color: "#00AAAA"
 
     RowLayout{
         anchors.fill: parent
