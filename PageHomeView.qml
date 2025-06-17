@@ -122,7 +122,7 @@ RowLayout{
         id:repeater
         model: qmlList.length
         Loader{
-            visible: failse
+            visible: false
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
