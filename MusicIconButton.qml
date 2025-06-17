@@ -3,7 +3,7 @@ import QtQuick.Controls
 
 
 Button{
-    property string iconSourse: ""
+    property string iconSource: ""
     property int iconWidth: 32
     property int iconHeight: 32
     //是否被选中
@@ -15,7 +15,7 @@ Button{
 
     id:self
 
-    icon.source: iconSourse
+    icon.source: iconSource
     icon.height: iconHeight
     icon.width: iconWidth
 

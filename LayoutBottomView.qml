@@ -20,20 +20,19 @@ Rectangle{
         MusicIconButton{
             Layout.preferredWidth: 50
             icon.source: "qrc:/images/previous"
-            icon.width: 32
-            icon.height: 32
+            toolTip: "上一曲"
         }
         MusicIconButton{
             Layout.preferredWidth: 50
             icon.source: "qrc:/images/stop"
-            icon.width: 32
-            icon.height: 32
+            toolTip: "暂停"
+
         }
         MusicIconButton{
             Layout.preferredWidth: 50
             icon.source: "qrc:/images/next"
-            icon.width: 32
-            icon.height: 32
+            toolTip: "下一曲"
+
         }
 
         Item {
@@ -101,21 +100,15 @@ Rectangle{
 
         MusicIconButton{
             Layout.preferredWidth: 50
-            icon.source: "qrc:/images/next"
-            icon.width: 32
-            icon.height: 32
-        }
-        MusicIconButton{
-            Layout.preferredWidth: 50
             icon.source: "qrc:/images/favorite"
-            icon.width: 32
-            icon.height: 32
+            toolTip: "喜欢"
+
         }
         MusicIconButton{
             Layout.preferredWidth: 50
             icon.source: "qrc:/images/repeat"
-            icon.width: 32
-            icon.height: 32
+            toolTip: "重复播放"
+
         }
 
         Item {

@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 
 
-ToolButton{
+Button{
     property string iconSource: ""
     property int iconWidth: 32
     property int iconHeight: 32
@@ -25,9 +25,9 @@ ToolButton{
 
     background: Rectangle{
         //点击按钮变色
-        color: self.down||(isCheckable&&self.checked)?"#eeeeee":"#00000000"
+        color: self.down||(isCheckable&&self.checked)?"#497563":"#20e9f4ff"
         //透明度
-        // radius: 3
+        radius: 3
 
     }
     icon.color: self.down||(isCheckable&&self.checked)?"#00000000":"#eeeeee"
