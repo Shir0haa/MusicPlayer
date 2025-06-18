@@ -52,7 +52,6 @@ Frame{
         }
         highlightMoveDuration: 0
         highlightResizeDuration: 0
-
     }
 
 
@@ -145,13 +144,14 @@ Frame{
                                     layoutBottomView.current = index             // 播放当前项
                                 }
                             }
-                            MusicIconButton{
+                            MusicIconButton {
                                 visible: favoritable
                                 iconSource: "qrc:/images/favorite"
                                 iconHeight: 16
                                 iconWidth: 16
                                 toolTip: "喜欢"
                                 onClicked: {
+                                    // 传递当前歌曲数据
                                     layoutBottomView.saveFavorite({
                                         id: model.id,
                                         name: model.name,
@@ -159,21 +159,28 @@ Frame{
                                         url: model.url,
                                         album: model.album,
                                         type: model.type
-                                    })
+                                    });
+                                    toolTip.text = "已收藏";
                                 }
                             }
-                            MusicIconButton{
+                            MusicIconButton {
                                 visible: deletable
                                 iconSource: "qrc:/images/clear"
                                 iconHeight: 16
                                 iconWidth: 16
                                 toolTip: "删除"
-                                onClicked: deleteItem(index)
+
+                                onClicked: {
+                                        if (favoritable === false) {
+                                            deleteFavorite(index); // 收藏列表直接删除
+                                        } else {
+                                            deleteItem(index); // 其他列表删除
+                                        }
+                                    }
                             }
                         }
                     }
                 }
-
                 onClicked: {
                     listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
                 }

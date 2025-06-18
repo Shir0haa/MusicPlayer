@@ -3,7 +3,7 @@ import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtMultimedia
-
+import QtCore
 
 
 Rectangle{
@@ -30,7 +30,6 @@ Rectangle{
     Layout.fillWidth: true
     height: 60
     color: "#00AAAA"
-
 
 
     RowLayout{
@@ -133,8 +132,10 @@ Rectangle{
         MusicIconButton{
             Layout.preferredWidth: 50
             icon.source: "qrc:/images/favorite"
-            toolTip: "喜欢"
-
+            iconWidth: 32
+            iconHeight: 32
+            toolTip: "添加喜欢"
+            onClicked: saveFavorite( playList[current])
         }
         MusicIconButton{
             Layout.preferredWidth: 50
@@ -200,6 +201,59 @@ Rectangle{
         slider.to = to
         slider.value = value
     }
+    //收藏我的喜欢
+    function saveFavorite(value = {})
+    {
+        //对象参数验证
+        if (!value || !value.id) {
+            console.error("无效的歌曲对象");
+            return;
+        }
+        //读取现有收藏列表
+        var favorites = [];
+        try {
+            var storedData = favoriteSettings.value("favorite", "[]");
+            favorites = JSON.parse(storedData);
+            if (!Array.isArray(favorites)) {
+                console.warn("收藏数据格式错误，重置为空数组");
+                favorites = [];
+            }
+        } catch (a) {
+            console.error("解析收藏列表失败:", a);
+            favorites = [];
+        }
+       //检查是否已存在
+        var exists = favorites.some(item => String(item.id) === String(value.id));
+        if (exists) {
+            console.log("歌曲已存在于收藏中");
+            return;
+        }
+        // 准备要保存的歌曲数据
+        var songToSave = {
+            id: String(value.id),
+            name: String(value.name || "未知歌曲"),
+            artist: String(value.artist || "未知艺术家"),
+            url: value.url ? String(value.url) : "",
+            type: value.type ? String(value.type) : "0",
+            album: String(value.album || "本地音乐")
+        };
+        //添加到收藏列表开头
+        favorites.unshift(songToSave);
+        //限制收藏数量
+        if (favorites.length > 500) {
+            favorites = favorites.slice(0, 500);
+        }
 
-
+        //保存到设置
+        try {
+            favoriteSettings.setValue("favorite", JSON.stringify(favorites));
+            console.log("收藏成功，当前收藏数:", favorites.length);
+            //更新UI
+            if (favoriteListView && favoriteListView.musicList) {
+                favoriteListView.musicList = favorites;
+            }
+        } catch (e) {
+            console.error("保存收藏失败:", e);
+        }
+    }
 }
