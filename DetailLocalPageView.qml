@@ -112,7 +112,7 @@ ColumnLayout {
         getLocal()
     }
 
-    // 从本地设置读取音乐列表
+    //从本地设置读取音乐列表
     function getLocal() {
         var str = localSettings.value("local", "[]")
         try {

@@ -2,6 +2,9 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtCore
+import QtMultimedia
+
 
 Window {
     id:window
@@ -14,6 +17,39 @@ Window {
     visible: true
     title: qsTr("鸟白岛音乐播放器")
 
+
+    Settings {
+        id: localSettings
+        category: "local"
+    }
+
+
+    AudioOutput {
+        id: audioOutput
+        volume: 1.0
+    }
+
+    MediaPlayer{
+        id:mediaPlayer
+
+        property var times: []
+
+        onPositionChanged: function(position) {
+            //控制底部进度条 同步显示音乐进度
+            layoutBottomView.setSlider(0, duration, position)
+        }
+
+        audioOutput: audioOutput
+
+        //控制播放按钮与播放状态
+        onPlaybackStateChanged: {
+            layoutBottomView.playingState = playbackState===MediaPlayer.PlayingState? 1:0
+
+            if(playbackState===MediaPlayer.StoppedState&&layoutBottomView.playbackStateChangeCallbackEnabled){
+                layoutBottomView.playNext()
+            }
+        }
+    }
 
 
     ColumnLayout{
@@ -29,12 +65,15 @@ Window {
 
        }
 
-      //底部工具栏
-        LayoutBottomView{
-            id:layoutBottomView
+       //底部工具栏
+       LayoutBottomView{
+           id:layoutBottomView
+           //传入mediaPlayer
+           mediaPlayer: mediaPlayer
 
-        }
+       }
       }
+
 }
 
 
