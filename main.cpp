@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QIcon>
+#include "httputils.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,6 +9,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
+
+    //参数：qmlRegisterType<C++类型名> (命名空间 主版本 次版本 QML中的类型名)
+    qmlRegisterType<HttpUtils>("MyUtils" ,1 ,0 ,"HttpUtils");   //注册到qml
 
     app.setWindowIcon(QIcon(":/images/cat"));
 
