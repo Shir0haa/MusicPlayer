@@ -158,6 +158,38 @@ Rectangle{
             onClicked: changePlayMode()
         }
 
+        //添加倍速功能（只增加0.9x,1.1x）因为变速会导致变调,会影响听歌体验
+        Button {
+            id: speedButton
+            text: mediaPlayer.playbackRate + "x"
+            font.pixelSize: 14
+            background: Rectangle {
+                radius: 6
+                color: "#00AAAA"
+                border.color: "#ffffff"
+            }
+            contentItem: Text {
+                text: speedButton.text
+                color: "white"
+                font.bold: true
+                anchors.centerIn: parent
+            }
+
+            onClicked: {
+                // 使用 popup(x, y)，确保菜单弹出在按钮处
+                speedMenu.popup(speedButton.mapToItem(null, 0, speedButton.height).x,
+                                speedButton.mapToItem(null, 0, speedButton.height).y)
+            }
+            ToolTip.text: "当前倍速：" + mediaPlayer.playbackRate + "x"
+        }
+
+        Menu {
+            id: speedMenu
+            MenuItem { text: "0.9x"; onTriggered: setSpeed(0.9) }
+            MenuItem { text: "1x"; onTriggered: setSpeed(1.0) }
+            MenuItem { text: "1.1x"; onTriggered: setSpeed(1.1) }
+        }
+
         Item {
             Layout.preferredWidth: parent.width/10
             Layout.fillWidth: true
@@ -176,6 +208,12 @@ Rectangle{
         playMusic(current)
     }
 
+
+    // 设置倍速函数
+    function setSpeed(value) {
+        mediaPlayer.playbackRate = value
+        speedButton.text = value + "x"
+    }
 
     // 时间格式化：00:00
     function formatTime(ms) {

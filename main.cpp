@@ -15,8 +15,9 @@ int main(int argc, char *argv[])
 
     app.setWindowIcon(QIcon(":/images/cat"));
 
-    QCoreApplication::setOrganizationName("MyOrg");       // 自定义
-    QCoreApplication::setOrganizationDomain("myorg.com"); // 自定义
+    // 自定义
+    QCoreApplication::setOrganizationName("MyOrg");
+    QCoreApplication::setOrganizationDomain("myorg.com");
     QCoreApplication::setApplicationName("ShirohaPlayer");
 
     QQmlApplicationEngine engine;
