@@ -4,7 +4,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCore
 import QtMultimedia
-import Qt.labs.settings
 import MyUtils
 
 Window {
@@ -42,7 +41,6 @@ Window {
     }
     Settings {
         id: favoriteSettings
-        fileName: "conf/favorites.ini"  // 指定独立文件存储收藏
         category: "favorites"
     }
 

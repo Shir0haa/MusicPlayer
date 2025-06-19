@@ -16,6 +16,11 @@ Rectangle{
 
 
     property int currentPlayMode: 0
+    //三种播放模式
+    property var playModeList: [
+        {icon:"single-repeat",name:"单曲循环"},
+        {icon:"repeat",name:"顺序播放"},
+        {icon:"random",name:"随机播放"}]
 
     // 当前歌曲信息
     property string musicName: ""
@@ -45,19 +50,25 @@ Rectangle{
             Layout.preferredWidth: 50
             icon.source: "qrc:/images/previous"
             toolTip: "上一曲"
+            onClicked: playPrevious()
         }
-        MusicIconButton{
+        MusicIconButton {
             Layout.preferredWidth: 50
-            icon.source: "qrc:/images/stop"
-            toolTip: "暂停"
-            onClicked:playOrPause()
-
+            //动态设置暂停/播放图标
+            icon.source: mediaPlayer.playbackState === MediaPlayer.PlayingState
+                         ? "qrc:/images/pause"
+                         : "qrc:/images/stop"
+            toolTip: mediaPlayer.playbackState === MediaPlayer.PlayingState
+                     ? "暂停"
+                     : "播放"
+            onClicked: playOrPause()
         }
+
         MusicIconButton{
             Layout.preferredWidth: 50
             icon.source: "qrc:/images/next"
             toolTip: "下一曲"
-
+            onClicked: playNext()
         }
 
 
@@ -68,15 +79,15 @@ Rectangle{
             Layout.topMargin: 25
 
             Text {
-                id:nameText
+                id: nameText
                 anchors.left: slider.left
                 anchors.bottom: slider.top
-                // anchors.bottomMargin: 5
                 anchors.leftMargin: 5
-                text: qsTr("Shiroha")
+                text: musicName ? musicName : qsTr("暂无歌曲")
                 font.family: "微软雅黑"
                 color: "#ffffff"
             }
+
             Text {
                 id:timeText
                 anchors.right: slider.right
@@ -137,11 +148,14 @@ Rectangle{
             toolTip: "添加喜欢"
             onClicked: saveFavorite( playList[current])
         }
+        //加载播放模式图标
         MusicIconButton{
             Layout.preferredWidth: 50
-            icon.source: "qrc:/images/repeat"
-            toolTip: "重复播放"
-
+            icon.source: "qrc:/images/"+playModeList[currentPlayMode].icon
+            iconWidth: 32
+            iconHeight: 32
+            toolTip: playModeList[currentPlayMode].name
+            onClicked: changePlayMode()
         }
 
         Item {
@@ -200,6 +214,48 @@ Rectangle{
         slider.from = from
         slider.to = to
         slider.value = value
+    }
+
+    //改变播放模式
+    function changePlayMode(){
+        currentPlayMode = (currentPlayMode+1)%playModeList.length
+        localSettings.setValue("currentPlayMode",currentPlayMode)
+    }
+
+    // 播放上一首
+    function playPrevious(){
+          if(playList.length<1)return
+          switch(currentPlayMode){
+          case 1:
+              current = (current+playList.length-1)%playList.length
+              break
+          case 2:{
+              var random = parseInt(Math.random()*playList.length)
+              current = current === random?random+1:random
+              break
+          }
+          }
+      }
+
+
+
+    // 播放下一首
+    function playNext(type='natural'){
+        if(playList.length<1)return
+        switch(currentPlayMode){
+        case 0:
+            if(type==='natural'){
+                mediaPlayer.play()
+            }break
+        case 1:
+            current = (current+1)%playList.length
+            break
+        case 2:{
+            var random = parseInt(Math.random()*playList.length)
+            current = current === random?random+1:random
+            break
+        }
+        }
     }
     //收藏我的喜欢
     function saveFavorite(value = {})

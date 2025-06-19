@@ -16,7 +16,6 @@ ColumnLayout{
             x:10
             verticalAlignment: Text.AlignBottom
             text: qsTr("我喜欢的")
-            font.family: window.mFONT_FAMILY
             font.pointSize: 25
             color: "#ADD8E6"
         }

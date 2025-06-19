@@ -5,7 +5,6 @@ import QtQuick.Dialogs as Dialogs
 import QtCore
 
 ColumnLayout {
-    property string localIniPath: "conf/local.ini"
 
 
     // 用于持久化保存本地音乐列表
