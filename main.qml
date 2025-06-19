@@ -35,14 +35,21 @@ Window {
       }
 
 
-    Settings {
+    Settings
+    {
         id: localSettings
         category: "local"
     }
-    Settings {
+    Settings
+    {
         id: favoriteSettings
         category: "favorites"
     }
+    Settings
+    {
+            id:historySettings
+            category:"history"
+        }
 
 
     AudioOutput {

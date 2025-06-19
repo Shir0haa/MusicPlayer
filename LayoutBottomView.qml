@@ -239,11 +239,13 @@ Rectangle{
             //播放本地音乐
             playLocalMusic()
         }
+        saveHistory(current)//保存播放历史
     }
-    function playLocalMusic(){
+    function playLocalMusic() {
         var currentItem = playList[current]
-        mediaPlayer.source =currentItem.url
+        mediaPlayer.source = currentItem.url
         mediaPlayer.play()
+        saveHistory(current) // 调用历史保存
         musicName = currentItem.name
         musicArtist = currentItem.artist
     }
@@ -275,8 +277,6 @@ Rectangle{
           }
       }
 
-
-
     // 播放下一首
     function playNext(type='natural'){
         if(playList.length<1)return
@@ -295,6 +295,7 @@ Rectangle{
         }
         }
     }
+
     //收藏我的喜欢
     function saveFavorite(value = {})
     {
@@ -337,17 +338,69 @@ Rectangle{
         if (favorites.length > 500) {
             favorites = favorites.slice(0, 500);
         }
-
         //保存到设置
+        favoriteSettings.setValue("favorite", JSON.stringify(favorites));
+        console.log("收藏成功，当前收藏数:", favorites.length);
+}
+
+    //保存播放历史
+    function saveHistory(index = 0) {
+        //验证索引是否有效
+        if (index < 0 || index >= playList.length) {
+            console.warn("Invalid index for saveHistory:", index)
+            return false
+        }
+
+        //获取当前歌曲项并验证
+        var item = playList[index]
+        if (!item || typeof item !== 'object' || !item.id) {
+            console.warn("Invalid music item at index", index, ":", item)
+            return false
+        }
+
+        //准备要保存的数据
+        var historyItem = {
+            id: String(item.id || ''),
+            name: String(item.name || '未知歌曲'),
+            artist: String(item.artist || '未知艺术家'),
+            url: String(item.url || ''),
+            type: String(item.type || '0'),
+            album: String(item.album || '未知专辑'),
+            timestamp: new Date().toLocaleString()
+        }
+
+        //获取现有历史记录
+        var history = []
         try {
-            favoriteSettings.setValue("favorite", JSON.stringify(favorites));
-            console.log("收藏成功，当前收藏数:", favorites.length);
-            //更新UI
-            if (favoriteListView && favoriteListView.musicList) {
-                favoriteListView.musicList = favorites;
+            history = historySettings.value("history", [])
+            if (!Array.isArray(history)) {
+                console.warn("History data is not array, resetting")
+                history = []
             }
+        } catch (a) {
+            console.error("Error reading history:", a)
+            history = []
+        }
+        //移除重复项
+        var existingIndex = history.findIndex(i => i.id === historyItem.id)
+        if (existingIndex >= 0) {
+            history.splice(existingIndex, 1)
+        }
+        //添加到历史记录开头
+        history.unshift(historyItem)
+        //限制历史记录数量
+        if (history.length > 100) {
+            history = history.slice(0, 100)
+        }
+        //保存到Settings
+        try {
+            historySettings.setValue("history", history)
+            console.log("History saved successfully")
+            return true
         } catch (e) {
-            console.error("保存收藏失败:", e);
+            console.error("Error saving history:", e)
+            return false
         }
     }
 }
+
