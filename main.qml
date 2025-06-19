@@ -25,15 +25,6 @@ Window {
           testHttp()
       }
 
-      function testHttp(){
-          function onReply(reply){
-              console.log(reply)
-              http.onReplySignal.disconnect(onReply)  //断开,解绑
-          }
-          http.onReplySignal.connect(onReply) //绑定到c++的replay
-          http.connect("banner")
-      }
-
 
     Settings
     {
