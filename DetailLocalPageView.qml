@@ -70,38 +70,53 @@ ColumnLayout {
         nameFilters: ["MP3 (*.mp3)", "FLAC (*.flac)", "WAV (*.wav)"]
         currentFolder: StandardPaths.standardLocations(StandardPaths.MusicLocation)[0]
 
+
         onAccepted: {
             var list = getLocal()
             for (var i = 0; i < selectedFiles.length; i++) {
                 var path = selectedFiles[i].toString()
-                var arr = path.split("/")
-                var fileName = arr[arr.length - 1]
-                var fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."))
 
-                var nameArr = fileNameWithoutExt.split("-")
-                var artist = "未知"
-                var name = fileNameWithoutExt
-                if (nameArr.length > 1) {
-                    artist = nameArr[0].trim()
-                    nameArr.shift()
-                    name = nameArr.join("-").trim()
+
+                // 从 C++ 获取真实音乐信息
+                var meta = metaReader.getFileInfo(path)
+                var name = meta.title || "未知"
+                var artist = meta.artist || "未知"
+                var album = meta.album || "本地音乐"
+
+
+                //部分歌曲并不为标准音乐格式，没有包含歌名歌手等信息，需要从文件名解析
+                //仅当歌曲名为“未知”时，尝试从文件名解析歌名（不处理 artist）
+                //但文件名有些也不准确，因此只解析歌曲名部分
+                if (name === "未知") {
+                    var arr = path.split("/")
+                    var fileName = arr[arr.length - 1]
+                    var fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."))
+
+                    var nameArr = fileNameWithoutExt.split("-")
+                    if (nameArr.length > 1) {
+                        //使用 '-' 前面部分作为歌名
+                        name = nameArr[0].trim()
+                    } else {
+                        name = fileNameWithoutExt
+                    }
                 }
 
-                // 如果当前列表中没有这个文件，则添加进去
+
+                //避免重复导入
                 if (!list.some(item => item.id === path)) {
                     list.push({
                         id: path,
                         name: name,
                         artist: artist,
+                        album: album,
                         url: path,
-                        album: "本地音乐",
                         type: "1"
                     })
                 }
             }
-            // 保存更新后的列表
             saveLocal(list)
         }
+
     }
 
     Component.onCompleted: {

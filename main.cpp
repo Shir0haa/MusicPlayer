@@ -2,6 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QIcon>
 #include "httputils.h"
+#include <QQmlContext>
+#include "filemetareader.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +34,9 @@ int main(int argc, char *argv[])
         },
         Qt::QueuedConnection);
     engine.load(url);
+
+    FileMetaReader metaReader;
+    engine.rootContext()->setContextProperty("metaReader", &metaReader);
 
     return app.exec();
 }

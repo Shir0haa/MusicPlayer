@@ -21,9 +21,9 @@ Window {
           id:http
       }
 
-      Component.onCompleted: {
-          testHttp()
-      }
+    Component.onCompleted: {
+        testHttp()
+    }
 
 
     Settings
