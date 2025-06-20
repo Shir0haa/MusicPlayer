@@ -80,6 +80,8 @@ ScrollView {
         getBannerList()
     }
 
+    //js 从网络导入数据
+
     function getBannerList(){
         function onReply(reply){
             http.onReplySignal.disconnect(onReply)  //断开,解绑

@@ -258,7 +258,10 @@ Frame{
         anchors.top: listView.bottom
         anchors.topMargin: 20
 
-        ButtonGroup { id: pageButtonGroup }
+        ButtonGroup {
+            id: pageButtonGroup
+            buttons: buttons.children
+        }
 
         RowLayout{
             id:buttons
