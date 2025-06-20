@@ -64,7 +64,7 @@ Frame{
             id:listViewDelegateItem
             height: 45
             width: listView.width
-            color: "#80CCCCCC"
+            //color: "#80CCCCCC"
 
             Shape{
                 anchors.fill: parent
@@ -86,106 +86,113 @@ Frame{
 
             property bool hovered: false
 
-            MouseArea{
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor  //鼠标悬停时显示为手型
-                onEntered: hovered = true
-                onExited: hovered = false
 
-                RowLayout{
-                    width: parent.width
-                    height: parent.height
-                    spacing: 15
-                    x:5
-                    Text{
-                        text:index+1+pageSize*current //将当前页的索引转换为全局序号
-                        horizontalAlignment: Qt.AlignHCenter
-                        Layout.preferredWidth: parent.width*0.05
-                        font.pointSize: 13
-                        color: "#eeffffff"
-                        elide: Qt.ElideRight
-                    }
-                    Text{
-                        text:name
-                        Layout.preferredWidth: parent.width*0.4
-                        font.pointSize: 13
-                        color: "#eeffffff"
-                        elide: Qt.ElideRight
-                    }
-                    Text{
-                        text:artist
-                        horizontalAlignment: Qt.AlignHCenter
-                        Layout.preferredWidth: parent.width*0.15
-                        font.pointSize: 13
-                        color: "#eeffffff"
-                        elide: Qt.ElideMiddle
-                    }
-                    Text{
-                        text:album
-                        horizontalAlignment: Qt.AlignHCenter
-                        Layout.preferredWidth: parent.width*0.15
-                        font.pointSize: 13
-                        color: "#eeffffff"
-                        elide: Qt.ElideMiddle
-                    }
-                    Item{
-                        Layout.preferredWidth: parent.width*0.15
-                        RowLayout{
-                            anchors.centerIn: parent
-                            MusicIconButton{
-                                iconSource: "qrc:/images/pause"
-                                iconHeight: 16
-                                iconWidth: 16
-                                toolTip: "播放"
-                                onClicked: {
-                                    layoutBottomView.current = -1                // 重置当前播放索引
-                                    layoutBottomView.playList = musicList        // 设置播放列表
-                                    layoutBottomView.current = index             // 播放当前项
-                                }
-                            }
-                            MusicIconButton {
-                                visible: favoritable
-                                iconSource: "qrc:/images/favorite"
-                                iconHeight: 16
-                                iconWidth: 16
-                                toolTip: "喜欢"
-                                onClicked: {
-                                    // 传递当前歌曲数据
-                                    layoutBottomView.saveFavorite({
-                                        id: model.id,
-                                        name: model.name,
-                                        artist: model.artist,
-                                        url: model.url,
-                                        album: model.album,
-                                        type: model.type
-                                    });
-                                    toolTip.text = "已收藏";
-                                }
-                            }
-                            MusicIconButton {
-                                visible: deletable
-                                iconSource: "qrc:/images/clear"
-                                iconHeight: 16
-                                iconWidth: 16
-                                toolTip: "删除"
+            TapHandler {
+                acceptedButtons: Qt.LeftButton  // 接受左键点击
+                gesturePolicy: TapHandler.WithinBounds  // 限制在组件范围内触发
+                cursorShape: Qt.PointingHandCursor  // 鼠标悬停时显示为手型
 
-                                onClicked: {
-                                        if (favoritable === false) {
-                                            deleteFavorite(index); // 收藏列表直接删除
-                                        } else {
-                                            deleteItem(index); // 其他列表删除
-                                        }
-                                    }
+                // 鼠标进入或离开时改变 hovered 状态
+                onPointChanged: {
+                    hovered = containsPress
+                }
+
+                // 点击选中当前项
+                onTapped: {
+                    listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
+                }
+            }
+
+            RowLayout {
+                width: parent.width
+                height: parent.height
+                spacing: 15
+                x: 5
+                Text {
+                    text: index + 1 + pageSize * current  // 当前页索引转换为全局序号
+                    horizontalAlignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.05
+                    font.pointSize: 13
+                    color: "#eeffffff"
+                    elide: Qt.ElideRight
+                }
+                Text {
+                    text: name
+                    Layout.preferredWidth: parent.width * 0.4
+                    font.pointSize: 13
+                    color: "#eeffffff"
+                    elide: Qt.ElideRight
+                }
+                Text {
+                    text: artist
+                    horizontalAlignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.15
+                    font.pointSize: 13
+                    color: "#eeffffff"
+                    elide: Qt.ElideMiddle
+                }
+                Text {
+                    text: album
+                    horizontalAlignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.15
+                    font.pointSize: 13
+                    color: "#eeffffff"
+                    elide: Qt.ElideMiddle
+                }
+                Item {
+                    Layout.preferredWidth: parent.width * 0.15
+                    RowLayout {
+                        anchors.centerIn: parent
+                        MusicIconButton {
+                            iconSource: "qrc:/images/pause"
+                            iconHeight: 16
+                            iconWidth: 16
+                            toolTip: "播放"
+                            onClicked: {
+                                layoutBottomView.current = -1
+                                layoutBottomView.playList = musicList
+                                layoutBottomView.current = index
+                            }
+                        }
+                        MusicIconButton {
+                            visible: favoritable
+                            iconSource: "qrc:/images/favorite"
+                            iconHeight: 16
+                            iconWidth: 16
+                            toolTip: "喜欢"
+                            onClicked: {
+                                layoutBottomView.saveFavorite({
+                                    id: model.id,
+                                    name: model.name,
+                                    artist: model.artist,
+                                    url: model.url,
+                                    album: model.album,
+                                    type: model.type
+                                });
+                                toolTip.text = "已收藏";
+                            }
+                        }
+                        MusicIconButton {
+                            visible: deletable
+                            iconSource: "qrc:/images/clear"
+                            iconHeight: 16
+                            iconWidth: 16
+                            toolTip: "删除"
+                            onClicked: {
+                                if (favoritable === false) {
+                                    deleteFavorite(index);
+                                } else {
+                                    deleteItem(index);
+                                }
                             }
                         }
                     }
                 }
-                onClicked: {
-                    listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
-                }
-
             }
+
+            // 根据 hovered 状态动态调整背景颜色
+            Behavior on color { ColorAnimation { duration: 150 } }
+            color: hovered ? "#A0CCCCCC" : "#80CCCCCC"
         }
     }
 

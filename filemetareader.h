@@ -20,5 +20,12 @@ class FileMetaReader : public QObject
 public:
     explicit FileMetaReader(QObject *parent = nullptr);
 
+    //图片提取
+    Q_INVOKABLE QString getCoverBase64(const QString &filePath);
+
     Q_INVOKABLE QVariantMap getFileInfo(const QString &filePath);
+
+private:
+    //返回图片数据
+    QByteArray extractCoverImage(const QString &localPath);
 };

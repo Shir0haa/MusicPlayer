@@ -1,5 +1,3 @@
-//MusicRoundImage.qml
-
 import QtQuick
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
@@ -14,7 +12,7 @@ Item {
         anchors.centerIn: parent
         source:imgSrc
         smooth: true
-        visible: false
+        visible: true
         width: parent.width
         height: parent.height
         fillMode: Image.PreserveAspectCrop

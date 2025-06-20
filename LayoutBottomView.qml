@@ -40,6 +40,7 @@ Rectangle{
     RowLayout{
         anchors.fill: parent
 
+
         Item {
             Layout.preferredWidth: parent.width/10
             Layout.fillWidth: true
@@ -138,6 +139,23 @@ Rectangle{
 
         }
 
+        //优先显示解析图片，没有则显示默认图片
+        MusicBorderImage {
+            id: musicCover
+            width: 50
+            height: 50
+
+            property string coverBase64: ""
+
+            imgSrc: coverBase64 !== "" ? coverBase64 : "qrc:/images/cat"
+
+            TapHandler {
+                onTapped: {
+                    pageDetailView.visible = !pageDetailView.visible
+                    pageHomeView.visible = !pageHomeView.visible
+                }
+            }
+        }
 
 
         MusicIconButton{
@@ -245,10 +263,15 @@ Rectangle{
         var currentItem = playList[current]
         mediaPlayer.source = currentItem.url
         mediaPlayer.play()
-        saveHistory(current) // 调用历史保存
+        saveHistory(current)
         musicName = currentItem.name
         musicArtist = currentItem.artist
+
+        // 需要写为 musicCover.coverBase64
+        musicCover.coverBase64 = metaReader.getCoverBase64(currentItem.url)
     }
+
+
     // 手动设置进度条范围和当前位置
     function setSlider(from, to, value) {
         slider.from = from

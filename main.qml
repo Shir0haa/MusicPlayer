@@ -38,9 +38,9 @@ Window {
     }
     Settings
     {
-            id:historySettings
-            category:"history"
-        }
+        id:historySettings
+        category:"history"
+    }
 
 
     AudioOutput {
@@ -82,6 +82,10 @@ Window {
        PageHomeView{
            id:pageHomeView
 
+       }
+       PageDetailView{
+                   id:pageDetailView
+                   visible: false
        }
 
        //底部工具栏

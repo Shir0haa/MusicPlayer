@@ -141,6 +141,7 @@ ColumnLayout {
     }
 
 
+    //保存已经导入的本地歌曲，在下次打开时依旧存在能被读取加载
     function saveLocal(list) {
         localSettings.setValue("local", JSON.stringify(list))
         getLocal()

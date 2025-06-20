@@ -4,127 +4,115 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQml
 
-RowLayout{
 
-    //左侧菜单的选项
+RowLayout {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+
+
+    // 左侧菜单配置 - 用于初始化 ListModel
     property var qmlList: [
-        {icon:"recommend-white",value:"推荐内容",qml:"DetailRecommendPageView"},
-        {icon:"cloud-white",value:"搜索音乐",qml:"DetailSearchPageView"},
-        {icon:"local-white",value:"本地音乐",qml:"DetailLocalPageView"},
-        {icon:"history-white",value:"播放历史",qml:"DetailHistoryPageView"},
-        {icon:"favorite-big-white",value:"我喜欢的",qml:"DetailFavoritePageView"},
-        {icon:"favorite-big-white",value:"专辑歌单",qml:"DetailPlayListPageView"}
+        { icon: "recommend-white", value: "推荐内容", qml: "DetailRecommendPageView" },
+        { icon: "cloud-white", value: "搜索音乐", qml: "DetailSearchPageView" },
+        { icon: "local-white", value: "本地音乐", qml: "DetailLocalPageView" },
+        { icon: "history-white", value: "播放历史", qml: "DetailHistoryPageView" },
+        { icon: "favorite-big-white", value: "我喜欢的", qml: "DetailFavoritePageView" },
+        { icon: "favorite-big-white", value: "专辑歌单", qml: "DetailPlayListPageView" }
     ]
-    Frame{
 
+    // 当前页面索引
+    property int currentIndex: 0
+
+    // 左侧菜单
+    Frame {
         Layout.preferredWidth: 200
         Layout.fillHeight: true
-        background: Rectangle{
-            color: "#00AAAA"
-        }
+        background: Rectangle { color: "#00AAAA" }
 
-        padding: 0
-
-
-        ColumnLayout{
+        ColumnLayout {
             anchors.fill: parent
+            spacing: 10
 
-            Item{
-                Layout.fillWidth: true
-                Layout.preferredHeight: 150
-
-                //圆，把图片裁切成圆形
-
-                MusicRoundImage{
-                    anchors.centerIn:parent
-                    height: 100
-                    width:100
-                    borderRadius: 100
-                }
+            // 顶部头像
+            MusicRoundImage {
+                Layout.alignment: Qt.AlignHCenter
+                width: 100
+                height: 100
+                borderRadius: 50
             }
 
-            ListView{
-                id:menuView
-                height: parent.height
+            // 菜单列表
+            ListView {
+                id: menuView
+                Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.fillWidth: true
-                model:ListModel{
-                    id:menuViewModel
+                model: ListModel {
+                    id: menuViewModel
                 }
-                delegate:menuViewDelegate
-                highlight: Rectangle{
-                    color: "#00AAAA"
-                }
-            }
-        }
+                delegate: Rectangle {
+                    id: menuItem
+                    width: parent.width
+                    height: 50
+                    color: ListView.isCurrentItem ? "#aa73a7ab" : "#00AAAA"
 
-        Component{
-            id:menuViewDelegate
-            Rectangle{
-                id:menuViewDelegateItem
-                height: 50
-                width: 200
-                color: "#00AAAA"
-                RowLayout{
-                    anchors.fill: parent
-                    anchors.centerIn: parent
-                    spacing:15
-                    Item{
-                        width: 30
-                    }
-
-                    Image{
-                        source: "qrc:/images/"+icon
-                        Layout.preferredHeight: 20
-                        Layout.preferredWidth: 20
-                    }
-
-                    Text{
-                        text:value
-                        Layout.fillWidth: true
-                        height:50
-                        color: "#ffffff"
-                    }
-                }
-                //鼠标悬停
-                MouseArea{
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onEntered: {
-                        color="#aa73a7ab"
-                    }
-                    onExited: {
-                        color="#00AAAA"
-                    }
-                    //鼠标点击事件，点击左侧菜单加载出对应的菜单
-                    onClicked:{
-                        repeater.itemAt(menuViewDelegateItem.ListView.view.currentIndex).visible =false
-                        menuViewDelegateItem.ListView.view.currentIndex = index
-                        var loader = repeater.itemAt(menuViewDelegateItem.ListView.view.currentIndex)
-                        loader.visible=true
-                        loader.source = qmlList[index].qml+".qml"
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: 10
+                        Item { width: 20 }  // 左边留白
+                        Image {
+                            source: "qrc:/images/" + model.icon
+                            Layout.preferredWidth: 20
+                            Layout.preferredHeight: 20
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true
                         }
+
+
+                        Text {
+                            text: model.value
+                            color: "white"
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: 16
+                        }
+                    }
+
+                    // 点击切换页面
+                    TapHandler {
+                        onTapped: {
+                            menuView.currentIndex = index
+                            currentIndex = index
+                            if (model.qml && model.qml.length > 0) {
+                                pageLoader.source = model.qml + ".qml"
+                            } else {
+                                console.warn("页面未定义：", model)
+                            }
+                        }
+                    }
                 }
             }
         }
 
+        // 初始化菜单数据
         Component.onCompleted: {
-            //打开自动加载推荐页面
-            menuViewModel.append(qmlList)
-            var loader = repeater.itemAt(0)
-            loader.visible = true
-            loader.source = qmlList.qml + ".qml"
+            for (var i = 0; i < qmlList.length; i++) {
+                menuViewModel.append(qmlList[i])
+            }
+            // 默认加载首页
+            if (qmlList.length > 0) {
+                pageLoader.source = qmlList[0].qml + ".qml"
+            }
         }
     }
 
-    //创建list
-    Repeater{
-        id:repeater
-        model: qmlList.length
-        Loader{
-            visible: false
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+    // 右侧页面区域
+    Loader {
+        id: pageLoader
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        onStatusChanged: {
+            if (status === Loader.Error) {
+                console.error("页面加载失败：", source, errorString)
+            }
         }
     }
 }

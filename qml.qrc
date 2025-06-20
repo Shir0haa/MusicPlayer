@@ -18,5 +18,7 @@
         <file>MusicBannerView.qml</file>
         <file>MusicGridHotView.qml</file>
         <file>MusicGridLatestView.qml</file>
+        <file>MusicBorderImage.qml</file>
+        <file>PageDetailView.qml</file>
     </qresource>
 </RCC>

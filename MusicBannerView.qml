@@ -23,17 +23,18 @@ Frame{
         clip: true  // 裁剪超出部分
 
         // 鼠标交互区域
-        MouseArea{
-            anchors.fill: parent
-            hoverEnabled: true  // 启用悬停检测
-            cursorShape: Qt.PointingHandCursor  // 鼠标指针变为手型
-            onEntered: {
-                bannerTimer.stop()  // 鼠标进入时暂停自动轮播
-            }
-            onExited: {
-                bannerTimer.start()  // 鼠标离开时恢复自动轮播
+        HoverHandler {
+            id: hoverHandler
+            acceptedDevices: PointerDevice.Mouse
+            onHoveredChanged: {
+                if (hovered) {
+                    bannerTimer.stop()
+                } else {
+                    bannerTimer.start()
+                }
             }
         }
+        //cursorShape: hoverHandler.hovered ? Qt.PointingHandCursor : Qt.ArrowCursor
 
         // 每个横幅的代理组件
         delegate: Item{
@@ -52,14 +53,13 @@ Frame{
             }
 
             // 可点击区域
-            MouseArea{
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    if(bannerView.currentIndex === index){
-                        // 点击当前选中项的处理
-                    }else{
-                        bannerView.currentIndex = index  // 切换选中项
+            TapHandler {
+                acceptedButtons: Qt.LeftButton
+                onTapped: {
+                    if (bannerView.currentIndex === index) {
+                        // TODO: 点击当前项的行为
+                    } else {
+                        bannerView.currentIndex = index
                     }
                 }
             }
@@ -125,16 +125,11 @@ Frame{
             }
 
             // 指示点的鼠标交互
-            MouseArea{
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onEntered: {
-                    bannerTimer.stop()  // 悬停时暂停自动轮播
-                    bannerView.currentIndex = index  // 切换到对应横幅
-                }
-                onExited: {
-                    bannerTimer.start()  // 离开时恢复自动轮播
+            TapHandler {
+                onTapped: {
+                    bannerTimer.stop()
+                    bannerView.currentIndex = index
+                    bannerTimer.start()
                 }
             }
         }

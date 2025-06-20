@@ -1,6 +1,3 @@
-// MusicGridLatestView.qml
-// 最新音乐网格视图组件
-
 import QtQuick
 import QtQuick.Controls
 import QtQml
@@ -71,19 +68,19 @@ Item {
                 }
 
                 // 鼠标交互区域
-                MouseArea {
-                    anchors.fill: parent  // 填充整个项
-                    hoverEnabled: true  // 启用悬停检测
+                TapHandler {
+                    acceptedButtons: Qt.LeftButton  // 接受左键点击
+                    gesturePolicy: TapHandler.WithinBounds  // 限制在组件范围内触发
                     cursorShape: Qt.PointingHandCursor  // 鼠标指针变为手型
 
-                    // 鼠标进入时改变背景色
-                    onEntered: {
-                        background.color = "#50000000"  // 半透明黑色
+                    // 鼠标进入或离开时改变背景色
+                    onPointChanged: {
+                        background.color = containsPress ? "#50000000" : "#00000000"
                     }
 
-                    // 鼠标离开时恢复透明
-                    onExited: {
-                        background.color = "#00000000"
+                    // 点击事件（可根据需要自定义行为）
+                    onTapped: {
+                        console.log("点击专辑:", modelData.album.name)
                     }
                 }
             }

@@ -8,6 +8,12 @@
 #include <taglib/wavfile.h>
 #include <QFileInfo>
 
+#include <QBuffer>
+#include <QImage>
+#include <QDebug>
+#include <taglib/id3v2frame.h>
+#include <taglib/attachedpictureframe.h>
+
 FileMetaReader::FileMetaReader(
     QObject *parent)
     : QObject(parent)
@@ -64,4 +70,72 @@ QVariantMap FileMetaReader::getFileInfo(
     result["artist"] = "未知";
     result["album"] = "本地音乐";
     return result;
+}
+
+// 读取封面图片 → 转为 Base64 → 返回 data:image/png;base64,...
+QString FileMetaReader::getCoverBase64(
+    const QString &filePath)
+{
+    QString localPath = QUrl(filePath).toLocalFile();
+    QString suffix = QFileInfo(localPath).suffix().toLower();
+
+    QByteArray coverData;
+
+    if (suffix == "mp3") {
+        TagLib::MPEG::File file(localPath.toUtf8().constData());
+        if (file.isValid()) {
+            auto *tag = file.ID3v2Tag();
+            if (tag) {
+                auto frames = tag->frameListMap()["APIC"];
+                if (!frames.isEmpty()) {
+                    auto *frame = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame *>(
+                        frames.front());
+                    if (frame) {
+                        coverData = QByteArray(frame->picture().data(), frame->picture().size());
+                    }
+                }
+            }
+        }
+    } else if (suffix == "flac") {
+        TagLib::FLAC::File file(localPath.toUtf8().constData());
+        if (file.isValid()) {
+            auto pictures = file.pictureList();
+            if (!pictures.isEmpty()) {
+                auto pic = pictures.front();
+                coverData = QByteArray(pic->data().data(), pic->data().size());
+            }
+        }
+    }
+    if (coverData.isEmpty())
+        return "";
+
+    return "data:image/jpeg;base64," + coverData.toBase64();
+}
+// 内部封面提取后返回图片二进制数据
+QByteArray FileMetaReader::extractCoverImage(
+    const QString &localPath)
+{
+    QString suffix = QFileInfo(localPath).suffix().toLower();
+
+    if (suffix == "mp3") {
+        TagLib::MPEG::File file(localPath.toUtf8().constData());
+        if (file.isValid() && file.ID3v2Tag()) {
+            auto *tag = file.ID3v2Tag();
+            auto frames = tag->frameListMap()["APIC"];
+            for (auto *frame : frames) {
+                auto *pic = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame *>(frame);
+                if (pic && !pic->picture().isEmpty())
+                    return QByteArray(pic->picture().data(), pic->picture().size());
+            }
+        }
+    } else if (suffix == "flac") {
+        TagLib::FLAC::File file(localPath.toUtf8().constData());
+        if (file.isValid()) {
+            auto pictures = file.pictureList();
+            if (!pictures.isEmpty())
+                return QByteArray(pictures.front()->data().data(), pictures.front()->data().size());
+        }
+    }
+    // WAV 不支持专辑封面则不作处理
+    return QByteArray();
 }
