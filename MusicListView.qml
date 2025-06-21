@@ -92,10 +92,7 @@ Frame{
                 gesturePolicy: TapHandler.WithinBounds  // 限制在组件范围内触发
                 cursorShape: Qt.PointingHandCursor  // 鼠标悬停时显示为手型
 
-                // 鼠标进入或离开时改变 hovered 状态
-                onPointChanged: {
-                    hovered = containsPress
-                }
+
 
                 // 点击选中当前项
                 onTapped: {
@@ -162,13 +159,13 @@ Frame{
                             toolTip: "喜欢"
                             onClicked: {
                                 layoutBottomView.saveFavorite({
-                                    id: model.id,
-                                    name: model.name,
-                                    artist: model.artist,
-                                    url: model.url,
-                                    album: model.album,
-                                    type: model.type
-                                });
+                                                                  id: model.id,
+                                                                  name: model.name,
+                                                                  artist: model.artist,
+                                                                  url: model.url,
+                                                                  album: model.album,
+                                                                  type: model.type
+                                                              });
                                 toolTip.text = "已收藏";
                             }
                         }
@@ -260,34 +257,34 @@ Frame{
 
         ButtonGroup {
             id: pageButtonGroup
-            buttons: buttons.children
         }
-
         RowLayout{
             id:buttons
             anchors.centerIn: parent
             Repeater{
                 id:repeater
                 model: all/pageSize>9?9:all/pageSize
-                Button{
-                    Text{
-                        anchors.centerIn: parent
-                        text: modelData+1
-
-                        font.pointSize: 14
-                        color: checked?"#497563":"#eeffffff"
-                    }
-                    background: Rectangle{
-                        implicitHeight: 30
-                        implicitWidth: 30
-                        color: checked?"#e2f0f8":"#20e9f4ff"
-                        radius: 3
-                    }
+                delegate: Button {
                     checkable: true
                     checked: modelData === current
                     onClicked: {
-                        if(current===index) return
-                        loadMore(current*pageSize,index)
+                        if (current === modelData) return
+                        loadMore(current * pageSize, modelData)
+                    }
+                    ButtonGroup.group: pageButtonGroup
+
+                    contentItem: Text {
+                        anchors.centerIn: parent
+                        text: modelData + 1
+                        font.pointSize: 14
+                        color: checked ? "#497563" : "#eeffffff"
+                    }
+
+                    background: Rectangle {
+                        implicitHeight: 30
+                        implicitWidth: 30
+                        color: checked ? "#e2f0f8" : "#20e9f4ff"
+                        radius: 3
                     }
                 }
             }

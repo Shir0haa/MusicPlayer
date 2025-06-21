@@ -14,6 +14,8 @@
 #include <taglib/id3v2frame.h>
 #include <taglib/attachedpictureframe.h>
 
+#include <taglib/xiphcomment.h>
+
 FileMetaReader::FileMetaReader(
     QObject *parent)
     : QObject(parent)
@@ -39,7 +41,9 @@ QVariantMap FileMetaReader::getFileInfo(
     if (suffix == "mp3") {
         TagLib::MPEG::File file(localPath.toUtf8().constData());
         if (file.isValid()) {
+            // 获取音频标签（ID3 标签）
             auto *tag = file.tag();
+
             result["title"] = QString::fromStdWString(tag->title().toWString());
             result["artist"] = QString::fromStdWString(tag->artist().toWString());
             result["album"] = QString::fromStdWString(tag->album().toWString());
@@ -76,14 +80,19 @@ QVariantMap FileMetaReader::getFileInfo(
 QString FileMetaReader::getCoverBase64(
     const QString &filePath)
 {
+    // 将传入的 URL 转换为本地文件路径
     QString localPath = QUrl(filePath).toLocalFile();
+
+    // 获取文件扩展名（转为小写，便于判断文件类型）
     QString suffix = QFileInfo(localPath).suffix().toLower();
 
+    // 用于保存封面图片原始数据
     QByteArray coverData;
 
     if (suffix == "mp3") {
         TagLib::MPEG::File file(localPath.toUtf8().constData());
         if (file.isValid()) {
+            // 获取 ID3v2 标签
             auto *tag = file.ID3v2Tag();
             if (tag) {
                 auto frames = tag->frameListMap()["APIC"];
@@ -91,6 +100,7 @@ QString FileMetaReader::getCoverBase64(
                     auto *frame = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame *>(
                         frames.front());
                     if (frame) {
+                        // 提取图片二进制数据
                         coverData = QByteArray(frame->picture().data(), frame->picture().size());
                     }
                 }
@@ -106,6 +116,7 @@ QString FileMetaReader::getCoverBase64(
             }
         }
     }
+    // 如果没有获取到封面 → 返回空字符串
     if (coverData.isEmpty())
         return "";
 
@@ -138,4 +149,51 @@ QByteArray FileMetaReader::extractCoverImage(
     }
     // WAV 不支持专辑封面则不作处理
     return QByteArray();
+}
+
+//提取音乐文件内嵌歌词
+//测试过很多mp3文件，都没有内嵌歌词，该功能暂时不继续深入
+QString FileMetaReader::getLyrics(
+    const QString &filePath)
+{
+    QString localPath = QUrl(filePath).toLocalFile();
+    QString suffix = QFileInfo(localPath).suffix().toLower();
+
+    if (suffix == "mp3") {
+        TagLib::MPEG::File file(localPath.toUtf8().constData());
+        if (file.isValid()) {
+            auto *tag = file.ID3v2Tag();
+            if (tag) {
+                // 优先尝试 USLT
+                auto usltFrames = tag->frameList("USLT");
+                if (!usltFrames.isEmpty()) {
+                    auto *frame = dynamic_cast<TagLib::ID3v2::TextIdentificationFrame *>(
+                        usltFrames.front());
+                    if (frame)
+                        return QString::fromStdWString(frame->toString().toWString());
+                }
+
+                // 兼容 TXXX:LYRICS（部分写入工具使用该格式）
+                auto frames = tag->frameList("TXXX");
+                for (auto *f : frames) {
+                    auto *textFrame = dynamic_cast<TagLib::ID3v2::UserTextIdentificationFrame *>(f);
+                    if (textFrame
+                        && QString::fromStdWString(textFrame->description().toWString()).toLower()
+                               == "lyrics") {
+                        return QString::fromStdWString(
+                            textFrame->fieldList().toString().toWString());
+                    }
+                }
+            }
+        }
+    } else if (suffix == "flac") {
+        TagLib::FLAC::File file(localPath.toUtf8().constData());
+        if (file.isValid()) {
+            auto tag = file.xiphComment();
+            if (tag && tag->contains("LYRICS"))
+                return QString::fromStdWString(tag->fieldListMap()["LYRICS"].toString().toWString());
+        }
+    }
+
+    return "";
 }

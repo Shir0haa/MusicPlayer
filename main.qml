@@ -22,7 +22,7 @@ Window {
       }
 
     Component.onCompleted: {
-        testHttp()
+        //testHttp()
     }
 
 

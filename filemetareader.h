@@ -25,6 +25,8 @@ public:
 
     Q_INVOKABLE QVariantMap getFileInfo(const QString &filePath);
 
+    Q_INVOKABLE QString getLyrics(const QString &filePath);
+
 private:
     //返回图片数据
     QByteArray extractCoverImage(const QString &localPath);

@@ -74,8 +74,10 @@ ColumnLayout {
         onAccepted: {
             var list = getLocal()
             for (var i = 0; i < selectedFiles.length; i++) {
-                var path = selectedFiles[i].toString()
 
+
+                var path = selectedFiles[i].toString()
+                var lyrics = metaReader.getLyrics ? metaReader.getLyrics(path) : ""
 
                 // 从 C++ 获取真实音乐信息
                 var meta = metaReader.getFileInfo(path)
@@ -104,14 +106,17 @@ ColumnLayout {
 
                 //避免重复导入
                 if (!list.some(item => item.id === path)) {
+
+
                     list.push({
-                        id: path,
-                        name: name,
-                        artist: artist,
-                        album: album,
-                        url: path,
-                        type: "1"
-                    })
+                                  id: path,
+                                  name: name,
+                                  artist: artist,
+                                  album: album,
+                                  url: path,
+                                  type: "1",
+                                  lyrics: lyrics
+                              })
                 }
             }
             saveLocal(list)

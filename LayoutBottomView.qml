@@ -31,6 +31,8 @@ Rectangle{
     // 播放状态（0 停止，1 播放）
     property int playingState: 0
 
+    property string coverBase64: ""
+
 
     Layout.fillWidth: true
     height: 60
@@ -145,9 +147,9 @@ Rectangle{
             width: 50
             height: 50
 
-            property string coverBase64: ""
 
-            imgSrc: coverBase64 !== "" ? coverBase64 : "qrc:/images/cat"
+
+            imgSrc: layoutBottomView.coverBase64 !== "" ? layoutBottomView.coverBase64 : "qrc:/images/cat"
 
             TapHandler {
                 onTapped: {
@@ -264,12 +266,14 @@ Rectangle{
         mediaPlayer.source = currentItem.url
         mediaPlayer.play()
         saveHistory(current)
+
         musicName = currentItem.name
         musicArtist = currentItem.artist
 
-        // 需要写为 musicCover.coverBase64
-        musicCover.coverBase64 = metaReader.getCoverBase64(currentItem.url)
+        // 更新封面 Base64 → 自动驱动所有绑定的 imgSrc 更新
+        coverBase64 = metaReader.getCoverBase64(currentItem.url)
     }
+
 
 
     // 手动设置进度条范围和当前位置
@@ -287,18 +291,18 @@ Rectangle{
 
     // 播放上一首
     function playPrevious(){
-          if(playList.length<1)return
-          switch(currentPlayMode){
-          case 1:
-              current = (current+playList.length-1)%playList.length
-              break
-          case 2:{
-              var random = parseInt(Math.random()*playList.length)
-              current = current === random?random+1:random
-              break
-          }
-          }
-      }
+        if(playList.length<1)return
+        switch(currentPlayMode){
+        case 1:
+            current = (current+playList.length-1)%playList.length
+            break
+        case 2:{
+            var random = parseInt(Math.random()*playList.length)
+            current = current === random?random+1:random
+            break
+        }
+        }
+    }
 
     // 播放下一首
     function playNext(type='natural'){
@@ -340,7 +344,7 @@ Rectangle{
             console.error("解析收藏列表失败:", a);
             favorites = [];
         }
-       //检查是否已存在
+        //检查是否已存在
         var exists = favorites.some(item => String(item.id) === String(value.id));
         if (exists) {
             console.log("歌曲已存在于收藏中");
@@ -364,7 +368,7 @@ Rectangle{
         //保存到设置
         favoriteSettings.setValue("favorite", JSON.stringify(favorites));
         console.log("收藏成功，当前收藏数:", favorites.length);
-}
+    }
 
     //保存播放历史
     function saveHistory(index = 0) {
