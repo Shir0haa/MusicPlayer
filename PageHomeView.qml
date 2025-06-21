@@ -17,7 +17,7 @@ RowLayout {
         { icon: "local-white", value: "本地音乐", qml: "DetailLocalPageView" },
         { icon: "history-white", value: "播放历史", qml: "DetailHistoryPageView" },
         { icon: "favorite-big-white", value: "我喜欢的", qml: "DetailFavoritePageView" },
-        { icon: "favorite-big-white", value: "      歌单", qml: "DetailPlayListPageView" }
+        { icon: "favorite-big-white", value: "我的歌单", qml: "DetailMyPlayListPageView" }
     ]
 
     // 当前页面索引

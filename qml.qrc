@@ -12,7 +12,7 @@
         <file>DetailLocalPageView.qml</file>
         <file>DetailHistoryPageView.qml</file>
         <file>DetailFavoritePageView.qml</file>
-        <file>DetailPlayListPageView.qml</file>
+        <file>DetailMyPlayListPageView.qml</file>
         <file>MusicListView.qml</file>
         <file>MusicTextButton.qml</file>
         <file>MusicBannerView.qml</file>
