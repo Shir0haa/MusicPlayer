@@ -1,3 +1,5 @@
+//LayoutBottomView.qml
+
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
@@ -8,7 +10,7 @@ import QtCore
 
 Rectangle{
 
-    property var mediaPlayer
+    // property var mediaPlayer
 
     // 播放列表
     property var playList: []
@@ -86,8 +88,9 @@ Rectangle{
                 anchors.left: slider.left
                 anchors.bottom: slider.top
                 anchors.leftMargin: 5
-                text: musicName ? musicName : qsTr("暂无歌曲")
-                font.family: "微软雅黑"
+                text: musicName ? musicName + " / " + musicArtist : qsTr("暂无歌曲")
+
+                // text: musicName ? musicName : qsTr("暂无歌曲")
                 color: "#ffffff"
             }
 
@@ -99,7 +102,6 @@ Rectangle{
                 anchors.rightMargin: 5
                 text: formatTime(mediaPlayer.position) + " / " + formatTime(mediaPlayer.duration)
 
-                font.family: "微软雅黑"
                 color: "#ffffff"
             }
 
@@ -146,8 +148,6 @@ Rectangle{
             id: musicCover
             width: 50
             height: 50
-
-
 
             imgSrc: layoutBottomView.coverBase64 !== "" ? layoutBottomView.coverBase64 : "qrc:/images/cat"
 
@@ -259,6 +259,9 @@ Rectangle{
             //播放本地音乐
             playLocalMusic()
         }
+        else
+            //播放网络音乐
+            playWebMusic()
         saveHistory(current)//保存播放历史
     }
     function playLocalMusic() {
@@ -272,8 +275,70 @@ Rectangle{
 
         // 更新封面 Base64 → 自动驱动所有绑定的 imgSrc 更新
         coverBase64 = metaReader.getCoverBase64(currentItem.url)
+
+        musicCover.imgSrc = coverBase64 !== "" ? coverBase64 : "qrc:/images/cat"
+
+
     }
 
+
+    function playWebMusic(index =  current){
+        //获取播放链接
+        getUrl(index)
+
+        }
+
+    function getUrl(index){
+        //播放
+        if(playList.length<index+1) return
+        var id = playList[index].id
+        if(!id) return
+
+        //设置详情
+        // nameText.text = playList[index].name+"/"+playList[index].artist
+
+        function onReply(reply){
+
+            http.onReplySignal.disconnect(onReply)
+
+            // console.log(reply)
+
+            var url = JSON.parse(reply).data[0].url
+            if(!url) return
+
+            var cover = playList[index].cover
+            if(cover.length<1) {
+                //请求Cover
+                getCover(id)
+            }else{
+                musicCover.imgSrc = cover
+            }
+            musicName = playList[index].name
+            musicArtist = playList[index].artist
+
+            mediaPlayer.source = url
+            mediaPlayer.play()
+        }
+
+        http.onReplySignal.connect(onReply)
+        http.connect("song/url?id="+id)
+    }
+
+    function getCover(id){
+        function onReply(reply){
+            http.onReplySignal.disconnect(onReply)
+
+            var cover = JSON.parse(reply).songs[0].al.picUrl
+            if(cover){
+                musicCover.imgSrc = url
+                coverBase64  = musicCover.imgSrc
+            }
+                // coverBase64 = url
+
+        }
+        http.onReplySignal.connect(onReply)
+        http.connect("song/detail?ids="+id)
+    }
 
 
     // 手动设置进度条范围和当前位置

@@ -81,7 +81,7 @@ ColumnLayout {
                         name: item.name,
                         artist: item.artists[0].name,
                         album: item.album.name,
-                        cover: ""
+                        cover:""
                     }
                 })
             } else {
@@ -92,7 +92,7 @@ ColumnLayout {
                         name: item.name,
                         artist: item.artists[0].name,
                         album: item.album.name,
-                        cover: ""
+                        cover:""
                     }
                 })
                 musicListView.musicList = musicListView.musicList.concat(newSongs)

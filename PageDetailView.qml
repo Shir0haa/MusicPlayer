@@ -74,6 +74,8 @@ Item {
                 height: width
                 borderRadius: width
                 imgSrc: layoutBottomView.coverBase64 !== "" ? layoutBottomView.coverBase64 : "qrc:/images/cat"
+
+                // imgSrc: musicCover.imgSrc = coverBase64 !== "" ? coverBase64 : "qrc:/images/cat"
                 isRotating: true
             }
         }

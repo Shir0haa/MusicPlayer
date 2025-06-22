@@ -92,7 +92,7 @@ Window {
        LayoutBottomView{
            id:layoutBottomView
            //传入mediaPlayer
-           mediaPlayer: mediaPlayer
+           // mediaPlayer: mediaPlayer
 
        }
       }

@@ -48,7 +48,7 @@ Frame{
         }
         header: listViewHeader
         highlight:Rectangle{
-            color: "blue"
+            color: "#00AAAA"
         }
         highlightMoveDuration: 0
         highlightResizeDuration: 0
@@ -84,14 +84,14 @@ Frame{
                 }
             }//在列表项底部绘制一条分隔线
 
-            property bool hovered: false
+            // property bool hovered: false
 
-            MouseArea{
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor  //鼠标悬停时显示为手型
-                onEntered: hovered = true
-                onExited: hovered = false
+            // MouseArea{
+            //     anchors.fill: parent
+            //     hoverEnabled: true
+            //     cursorShape: Qt.PointingHandCursor  //鼠标悬停时显示为手型
+            //     onEntered: hovered = true
+            //     onExited: hovered = false
 
                 RowLayout{
                     width: parent.width
@@ -139,7 +139,10 @@ Frame{
                                 iconWidth: 16
                                 toolTip: "播放"
                                 onClicked: {
-                                    layoutBottomView.current = -1                // 重置当前播放索引
+                                    // playMusic(index)
+                                    layoutBottomView.playList = musicList
+                                    // layoutBottomView.playMusic(index)
+                                    // layoutBottomView.current = -1                // 重置当前播放索引
                                     layoutBottomView.playList = musicList        // 设置播放列表
                                     layoutBottomView.current = index             // 播放当前项
                                 }
@@ -181,11 +184,21 @@ Frame{
                         }
                     }
                 }
-                onClicked: {
-                    listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
+
+                // 点击处理
+                TapHandler {
+                    acceptedButtons: Qt.LeftButton
+                    onTapped: {
+                        listViewDelegateItem.ListView.view.currentIndex = index
+                    }
                 }
 
-            }
+
+                // onClicked: {
+                //     listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
+                // }
+
+            // }
         }
     }
 
@@ -205,14 +218,14 @@ Frame{
                     horizontalAlignment: Qt.AlignHCenter//水平居中
                     Layout.preferredWidth: parent.width*0.05//占父容器宽度的5%
                     font.pointSize: 13// 字号13pt
-                    color: "#eeffffff"// 浅白色（带透明度）
+                    color: "#00AAAA"// 浅白色（带透明度）
                     elide: Qt.ElideRight // 文本过长时右侧省略
                 }
                 Text{
                     text:"歌名"
                     Layout.preferredWidth: parent.width*0.4
                     font.pointSize: 13
-                    color: "#eeffffff"
+                    color: "#00AAAA"
                     elide: Qt.ElideRight
                 }
                 Text{
@@ -220,7 +233,7 @@ Frame{
                     horizontalAlignment: Qt.AlignHCenter
                     Layout.preferredWidth: parent.width*0.15
                     font.pointSize: 13
-                    color: "#eeffffff"
+                    color: "#00AAAA"
                     elide: Qt.ElideMiddle
                 }
                 Text{
@@ -228,7 +241,7 @@ Frame{
                     horizontalAlignment: Qt.AlignHCenter
                     Layout.preferredWidth: parent.width*0.15
                     font.pointSize: 13
-                    color: "#eeffffff"
+                    color: "#00AAAA"
                     elide: Qt.ElideMiddle
                 }
                 Text{
@@ -236,7 +249,7 @@ Frame{
                     horizontalAlignment: Qt.AlignHCenter
                     Layout.preferredWidth: parent.width*0.15
                     font.pointSize: 13
-                    color: "#eeffffff"
+                    color: "#00AAAA"
                     elide: Qt.ElideRight
                 }
             }
@@ -286,4 +299,15 @@ Frame{
             }
         }
     }
+
+
+
 }
+
+
+
+
+
+
+
+
