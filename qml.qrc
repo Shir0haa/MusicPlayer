@@ -20,5 +20,6 @@
         <file>MusicGridLatestView.qml</file>
         <file>MusicBorderImage.qml</file>
         <file>PageDetailView.qml</file>
+        <file>DetailPlayListPageView.qml</file>
     </qresource>
 </RCC>

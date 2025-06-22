@@ -64,7 +64,7 @@ Frame{
             id:listViewDelegateItem
             height: 45
             width: listView.width
-            //color: "#80CCCCCC"
+            color: "#80CCCCCC"
 
             Shape{
                 anchors.fill: parent
@@ -86,110 +86,106 @@ Frame{
 
             property bool hovered: false
 
+            MouseArea{
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor  //鼠标悬停时显示为手型
+                onEntered: hovered = true
+                onExited: hovered = false
 
-            TapHandler {
-                acceptedButtons: Qt.LeftButton  // 接受左键点击
-                gesturePolicy: TapHandler.WithinBounds  // 限制在组件范围内触发
-                cursorShape: Qt.PointingHandCursor  // 鼠标悬停时显示为手型
-
-
-
-                // 点击选中当前项
-                onTapped: {
-                    listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
-                }
-            }
-
-            RowLayout {
-                width: parent.width
-                height: parent.height
-                spacing: 15
-                x: 5
-                Text {
-                    text: index + 1 + pageSize * current  // 当前页索引转换为全局序号
-                    horizontalAlignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.05
-                    font.pointSize: 13
-                    color: "#eeffffff"
-                    elide: Qt.ElideRight
-                }
-                Text {
-                    text: name
-                    Layout.preferredWidth: parent.width * 0.4
-                    font.pointSize: 13
-                    color: "#eeffffff"
-                    elide: Qt.ElideRight
-                }
-                Text {
-                    text: artist
-                    horizontalAlignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.15
-                    font.pointSize: 13
-                    color: "#eeffffff"
-                    elide: Qt.ElideMiddle
-                }
-                Text {
-                    text: album
-                    horizontalAlignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.15
-                    font.pointSize: 13
-                    color: "#eeffffff"
-                    elide: Qt.ElideMiddle
-                }
-                Item {
-                    Layout.preferredWidth: parent.width * 0.15
-                    RowLayout {
-                        anchors.centerIn: parent
-                        MusicIconButton {
-                            iconSource: "qrc:/images/pause"
-                            iconHeight: 16
-                            iconWidth: 16
-                            toolTip: "播放"
-                            onClicked: {
-                                layoutBottomView.current = -1
-                                layoutBottomView.playList = musicList
-                                layoutBottomView.current = index
+                RowLayout{
+                    width: parent.width
+                    height: parent.height
+                    spacing: 15
+                    x:5
+                    Text{
+                        text:index+1+pageSize*current //将当前页的索引转换为全局序号
+                        horizontalAlignment: Qt.AlignHCenter
+                        Layout.preferredWidth: parent.width*0.05
+                        font.pointSize: 13
+                        color: "#eeffffff"
+                        elide: Qt.ElideRight
+                    }
+                    Text{
+                        text:name
+                        Layout.preferredWidth: parent.width*0.4
+                        font.pointSize: 13
+                        color: "#eeffffff"
+                        elide: Qt.ElideRight
+                    }
+                    Text{
+                        text:artist
+                        horizontalAlignment: Qt.AlignHCenter
+                        Layout.preferredWidth: parent.width*0.15
+                        font.pointSize: 13
+                        color: "#eeffffff"
+                        elide: Qt.ElideMiddle
+                    }
+                    Text{
+                        text:album
+                        horizontalAlignment: Qt.AlignHCenter
+                        Layout.preferredWidth: parent.width*0.15
+                        font.pointSize: 13
+                        color: "#eeffffff"
+                        elide: Qt.ElideMiddle
+                    }
+                    Item{
+                        Layout.preferredWidth: parent.width*0.15
+                        RowLayout{
+                            anchors.centerIn: parent
+                            MusicIconButton{
+                                iconSource: "qrc:/images/pause"
+                                iconHeight: 16
+                                iconWidth: 16
+                                toolTip: "播放"
+                                onClicked: {
+                                    layoutBottomView.current = -1                // 重置当前播放索引
+                                    layoutBottomView.playList = musicList        // 设置播放列表
+                                    layoutBottomView.current = index             // 播放当前项
+                                }
                             }
-                        }
-                        MusicIconButton {
-                            visible: favoritable
-                            iconSource: "qrc:/images/favorite"
-                            iconHeight: 16
-                            iconWidth: 16
-                            toolTip: "喜欢"
-                            onClicked: {
-                                layoutBottomView.saveFavorite({
-                                                                  id: model.id,
-                                                                  name: model.name,
-                                                                  artist: model.artist,
-                                                                  url: model.url,
-                                                                  album: model.album,
-                                                                  type: model.type
-                                                              });
-                                toolTip.text = "已收藏";
+                            MusicIconButton {
+                                visible: favoritable
+                                iconSource: "qrc:/images/favorite"
+                                iconHeight: 16
+                                iconWidth: 16
+                                toolTip: "喜欢"
+                                onClicked: {
+                                    // 传递当前歌曲数据
+                                    layoutBottomView.saveFavorite({
+                                                                      id: model.id,
+                                                                      name: model.name,
+                                                                      artist: model.artist,
+                                                                      url: model.url,
+                                                                      album: model.album,
+                                                                      type: model.type
+                                                                  });
+                                    toolTip.text = "已收藏";
+                                }
                             }
-                        }
-                        MusicIconButton {
-                            visible: deletable
-                            iconSource: "qrc:/images/clear"
-                            iconHeight: 16
-                            iconWidth: 16
-                            toolTip: "删除"
-                            onClicked: {
-                                if (favoritable === false) {
-                                    deleteFavorite(index);
-                                } else {
-                                    deleteItem(index);
+                            MusicIconButton {
+                                visible: deletable
+                                iconSource: "qrc:/images/clear"
+                                iconHeight: 16
+                                iconWidth: 16
+                                toolTip: "删除"
+
+                                onClicked: {
+                                    if (favoritable === false) {
+                                        deleteFavorite(index); // 收藏列表直接删除
+                                    } else {
+                                        deleteItem(index); // 其他列表删除
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
+                onClicked: {
+                    listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
+                }
 
-            // 根据 hovered 状态动态调整背景颜色
-            Behavior on color { ColorAnimation { duration: 150 } }
-            color: hovered ? "#A0CCCCCC" : "#80CCCCCC"
+            }
         }
     }
 
@@ -257,34 +253,34 @@ Frame{
 
         ButtonGroup {
             id: pageButtonGroup
+            buttons:buttons.children
         }
+
         RowLayout{
             id:buttons
             anchors.centerIn: parent
             Repeater{
                 id:repeater
                 model: all/pageSize>9?9:all/pageSize
-                delegate: Button {
+                Button{
+                    Text{
+                        anchors.centerIn: parent
+                        text: modelData+1
+
+                        font.pointSize: 14
+                        color: checked?"#497563":"#eeffffff"
+                    }
+                    background: Rectangle{
+                        implicitHeight: 30
+                        implicitWidth: 30
+                        color: checked?"#e2f0f8":"#20e9f4ff"
+                        radius: 3
+                    }
                     checkable: true
                     checked: modelData === current
                     onClicked: {
-                        if (current === modelData) return
-                        loadMore(current * pageSize, modelData)
-                    }
-                    ButtonGroup.group: pageButtonGroup
-
-                    contentItem: Text {
-                        anchors.centerIn: parent
-                        text: modelData + 1
-                        font.pointSize: 14
-                        color: checked ? "#497563" : "#eeffffff"
-                    }
-
-                    background: Rectangle {
-                        implicitHeight: 30
-                        implicitWidth: 30
-                        color: checked ? "#e2f0f8" : "#20e9f4ff"
-                        radius: 3
+                        if(current===index) return
+                        loadMore(current*pageSize,index)
                     }
                 }
             }

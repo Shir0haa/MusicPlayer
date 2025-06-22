@@ -12,12 +12,13 @@ RowLayout {
 
     // 左侧菜单配置 - 用于初始化 ListModel
     property var qmlList: [
-        { icon: "recommend-white", value: "推荐内容", qml: "DetailRecommendPageView" },
-        { icon: "cloud-white", value: "搜索音乐", qml: "DetailSearchPageView" },
-        { icon: "local-white", value: "本地音乐", qml: "DetailLocalPageView" },
-        { icon: "history-white", value: "播放历史", qml: "DetailHistoryPageView" },
-        { icon: "favorite-big-white", value: "我喜欢的", qml: "DetailFavoritePageView" },
-        { icon: "favorite-big-white", value: "我的歌单", qml: "DetailMyPlayListPageView" }
+        {icon:"recommend-white",value:"推荐内容",qml:"DetailRecommendPageView",menu:true},
+        {icon:"cloud-white",value:"搜索音乐",qml:"DetailSearchPageView",menu:true},
+        {icon:"local-white",value:"本地音乐",qml:"DetailLocalPageView",menu:true},
+        {icon:"history-white",value:"播放历史",qml:"DetailHistoryPageView",menu:true},
+        {icon:"favorite-big-white",value:"我喜欢的",qml:"DetailFavoritePageView",menu:true},
+        {icon: "favorite-big-white", value: "我的歌单", qml: "DetailMyPlayListPageView",menu:true },
+        {icon:"",value:"",qml:"DetailPlayListPageView",menu:false}
     ]
 
     // 当前页面索引
@@ -79,13 +80,28 @@ RowLayout {
                     // 点击切换页面
                     TapHandler {
                         onTapped: {
-                            menuView.currentIndex = index
-                            currentIndex = index
-                            if (model.qml && model.qml.length > 0) {
-                                pageLoader.source = model.qml + ".qml"
-                            } else {
-                                console.warn("页面未定义：", model)
+
+                            menuView.currentIndex = index;
+                            currentIndex = index;
+
+                            // 隐藏所有 Loader
+                            for (var i = 0; i < repeater.count; i++) {
+                                repeater.itemAt(i).visible = false;
                             }
+
+                            // 显示并加载当前选中的页面
+                            var loader = repeater.itemAt(index);
+                            loader.visible = true;
+                            loader.source = model.qml + ".qml";
+
+
+                            // menuView.currentIndex = index
+                            // currentIndex = index
+                            // if (model.qml && model.qml.length > 0) {
+                            //     repeater.pageLoader.source = model.qml + ".qml"
+                            // } else {
+                            //     console.warn("页面未定义：", model)
+                            // }
                         }
                     }
                 }
@@ -94,25 +110,63 @@ RowLayout {
 
         // 初始化菜单数据
         Component.onCompleted: {
-            for (var i = 0; i < qmlList.length; i++) {
-                menuViewModel.append(qmlList[i])
-            }
-            // 默认加载首页
-            if (qmlList.length > 0) {
-                pageLoader.source = qmlList[0].qml + ".qml"
-            }
+
+
+            menuViewModel.append(qmlList.filter(item => item.menu))
+            // menuViewModel.append(qmlList)
+            var loader = repeater.itemAt(0)
+            loader.visible=true
+            loader.source = qmlList[0].qml+".qml"
+
+            // showPlayList()
+
+            // for (var i = 0; i < qmlList.length; i++) {
+            //     menuViewModel.append(qmlList[i])
+            // }
+            // // // 默认加载首页
+            // if (qmlList.length > 0) {
+            //     pageLoader.source = qmlList[0].qml + ".qml"
+            // }
         }
     }
 
-    // 右侧页面区域
-    Loader {
-        id: pageLoader
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        onStatusChanged: {
-            if (status === Loader.Error) {
-                console.error("页面加载失败：", source, errorString)
-            }
+
+    Repeater{
+        id:repeater
+        // model: qmlList.filter(item => item.menu).length
+        model: qmlList.length
+        Loader{
+            id:pageLoader
+            visible: false
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
     }
+    // // 右侧页面区域
+    // Loader {
+    //     id: pageLoader
+    //     Layout.fillWidth: true
+    //     Layout.fillHeight: true
+    //     onStatusChanged: {
+    //         if (status === Loader.Error) {
+    //             console.error("页面加载失败：", source, errorString)
+    //         }
+    //     }
+    // }
+
+    function showPlayList(targetId="",targetType="10"){
+        repeater.itemAt(menuView.currentIndex).visible = false
+        var loader = repeater.itemAt(6)
+        loader.visible = true
+        loader.source = qmlList[6].qml+".qml"
+        loader.item.targetType=targetType
+        loader.item.targetId=targetId
+    }
+
+    function hidePlayList(){
+        repeater.itemAt(menuView.currentIndex).visible = true
+        var loader = repeater.itemAt(6)
+        loader.visible = false
+    }
+
 }

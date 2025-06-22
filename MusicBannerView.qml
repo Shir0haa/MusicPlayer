@@ -58,6 +58,24 @@ Frame{
                 onTapped: {
                     if (bannerView.currentIndex === index) {
                         // TODO: 点击当前项的行为
+                        var item  =bannerView.model[index]
+                        var targetId = item.targetId+""
+                        var targetType = item.targetType+"" //1:单曲,10:专辑,1000:歌单
+                        switch(targetType){
+                        case "1":
+                            //播放歌曲
+                            layoutBottomView.current = -1
+                            layoutBottomView.playList=[{id:targetId,name:"",artist:"",cover:"",album:""}]
+                            layoutBottomView.current = 0
+                            break
+                        case "10":
+                            //打开专辑
+                        case "1000":
+                            //打开播放列表
+                            pageHomeView.showPlayList(targetId,targetType)
+                            break
+                        }
+                        // console.log(targetId,targetType)
                     } else {
                         bannerView.currentIndex = index
                     }

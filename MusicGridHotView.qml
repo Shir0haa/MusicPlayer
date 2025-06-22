@@ -62,19 +62,23 @@ Item {
                     cursorShape: Qt.PointingHandCursor  // 鼠标悬停时显示手型指针
 
                     // 鼠标进入时改变背景色（半透明黑色）
-                    onPointChanged: {
-                        if (containsPress) {
-                            background.color = "#50000000"
-                        } else {
-                            background.color = "#00000000"
-                        }
+                    onPressedChanged: {
+                        background.color = pressed ? "#50000000" : "#00000000"
                     }
+                    // onPointChanged: {
+                    //     if (containsPress) {
+                    //         background.color = "#50000000"
+                    //     } else {
+                    //         background.color = "#00000000"
+                    //     }
+                    // }
 
                     // 点击事件处理
                     onTapped: {
                         // TODO: 在此处理点击事件，例如进入歌单详情页
                         console.log("点击歌单:", modelData.name)
-                    }
+                        var item  =gridRepeater.model[index]
+                        pageHomeView.showPlayList(item.id,"1000")                    }
                 }
             }
         }

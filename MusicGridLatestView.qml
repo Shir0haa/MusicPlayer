@@ -74,8 +74,8 @@ Item {
                     cursorShape: Qt.PointingHandCursor  // 鼠标指针变为手型
 
                     // 鼠标进入或离开时改变背景色
-                    onPointChanged: {
-                        background.color = containsPress ? "#50000000" : "#00000000"
+                    onPressedChanged: {
+                        background.color = pressed ? "#50000000" : "#00000000"
                     }
 
                     // 点击事件（可根据需要自定义行为）
