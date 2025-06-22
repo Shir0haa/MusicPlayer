@@ -35,6 +35,8 @@ Rectangle{
 
     property string coverBase64: ""
 
+    property string musicCover: ""
+
 
     Layout.fillWidth: true
     height: 60
@@ -145,11 +147,12 @@ Rectangle{
 
         //优先显示解析图片，没有则显示默认图片
         MusicBorderImage {
-            id: musicCover
+            id: myMusicCover
             width: 50
             height: 50
-
-            imgSrc: layoutBottomView.coverBase64 !== "" ? layoutBottomView.coverBase64 : "qrc:/images/cat"
+            imgSrc: musicCover
+            // imgSrc: layoutBottomView.musicCover
+            // imgSrc: layoutBottomView.coverBase64 !== "" ? layoutBottomView.coverBase64 : "qrc:/images/cat"
 
             TapHandler {
                 onTapped: {
@@ -275,8 +278,8 @@ Rectangle{
 
         // 更新封面 Base64 → 自动驱动所有绑定的 imgSrc 更新
         coverBase64 = metaReader.getCoverBase64(currentItem.url)
-
-        musicCover.imgSrc = coverBase64 !== "" ? coverBase64 : "qrc:/images/cat"
+        musicCover = coverBase64 !== "" ? coverBase64 : "qrc:/images/cat"
+        // musicCover.imgSrc = coverBase64 !== "" ? coverBase64 : "qrc:/images/cat"
 
 
     }
@@ -311,7 +314,8 @@ Rectangle{
                 //请求Cover
                 getCover(id)
             }else{
-                musicCover.imgSrc = cover
+                musicCover = cover
+                // musicCover.imgSrc = cover
             }
             musicName = playList[index].name
             musicArtist = playList[index].artist

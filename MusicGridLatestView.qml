@@ -81,6 +81,16 @@ Item {
                     // 点击事件（可根据需要自定义行为）
                     onTapped: {
                         console.log("点击专辑:", modelData.album.name)
+                        layoutBottomView.current = -1
+                        layoutBottomView.playList = [{
+                                                         id:list[index].id,
+                                                         name:list[index].name,
+                                                         artist:list[index].artists[0].name,
+                                                         album:list[index].album.name,
+                                                         cover:list[index].album.picUrl,
+                                                         type:"0"
+                                                     }]
+                        layoutBottomView.current = 0
                     }
                 }
             }

@@ -78,7 +78,8 @@ Item {
                         // TODO: 在此处理点击事件，例如进入歌单详情页
                         console.log("点击歌单:", modelData.name)
                         var item  =gridRepeater.model[index]
-                        pageHomeView.showPlayList(item.id,"1000")                    }
+                        pageHomeView.showPlayList(item.id,"1000")
+                    }
                 }
             }
         }

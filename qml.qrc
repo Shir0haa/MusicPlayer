@@ -21,5 +21,6 @@
         <file>MusicBorderImage.qml</file>
         <file>PageDetailView.qml</file>
         <file>DetailPlayListPageView.qml</file>
+        <file>MusicLyricView.qml</file>
     </qresource>
 </RCC>
