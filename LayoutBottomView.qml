@@ -332,13 +332,18 @@ Rectangle{
         function onReply(reply){
             http.onReplySignal.disconnect(onReply)
 
-            var cover = JSON.parse(reply).songs[0].al.picUrl
+            var song = JSON.parse(reply).songs[0]
+            var cover = song.al.picUrl
+            // var cover = JSON.parse(reply).songs[0].al.picUrl
             if(cover){
-                musicCover.imgSrc = url
-                coverBase64  = musicCover.imgSrc
+                //修改了cover,让search的也可以显示
+                musicCover = cover
+                if(musicName.length<1)musicName = song.name
+                if(musicArtist.length<1)musicArtist = song.ar[0].name
+                // musicCover.imgSrc = url
+                // coverBase64  = musicCover.imgSrc
             }
-                // coverBase64 = url
-
+            // coverBase64 = url
         }
         http.onReplySignal.connect(onReply)
         http.connect("song/detail?ids="+id)
