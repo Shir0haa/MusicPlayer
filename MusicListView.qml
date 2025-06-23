@@ -247,48 +247,37 @@ Frame{
 
         ButtonGroup {
             id: pageButtonGroup
-            buttons:buttons.children
         }
-
         RowLayout{
             id:buttons
             anchors.centerIn: parent
             Repeater{
                 id:repeater
                 model: all/pageSize>9?9:all/pageSize
-                Button{
-                    Text{
-                        anchors.centerIn: parent
-                        text: modelData+1
-
-                        font.pointSize: 14
-                        color: checked?"#497563":"#eeffffff"
-                    }
-                    background: Rectangle{
-                        implicitHeight: 30
-                        implicitWidth: 30
-                        color: checked?"#e2f0f8":"#20e9f4ff"
-                        radius: 3
-                    }
+                delegate: Button {
                     checkable: true
                     checked: modelData === current
                     onClicked: {
-                        if(current===index) return
-                        loadMore(current*pageSize,index)
+                        if (current === modelData) return
+                        loadMore(current * pageSize, modelData)
+                    }
+                    ButtonGroup.group: pageButtonGroup
+
+                    contentItem: Text {
+                        anchors.centerIn: parent
+                        text: modelData + 1
+                        font.pointSize: 14
+                        color: checked ? "#497563" : "#eeffffff"
+                    }
+
+                    background: Rectangle {
+                        implicitHeight: 30
+                        implicitWidth: 30
+                        color: checked ? "#e2f0f8" : "#20e9f4ff"
+                        radius: 3
                     }
                 }
             }
         }
     }
-
-
-
 }
-
-
-
-
-
-
-
-

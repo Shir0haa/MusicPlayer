@@ -47,22 +47,27 @@ ColumnLayout{
         onDeleteItem: deleteHistory(index)
     }
 
+
     Component.onCompleted: {
         getHistory()
     }
 
-    function getHistory(){
-        historyListView.musicList = historySettings.value("history",[])
+
+
+    function getHistory() {
+        var data = historySettings.value("history", "[]");
+        historyListView.musicList = JSON.parse(data);
+
     }
 
     function clearHistory(){
-        historySettings.setValue("history",[])
-        getHistory()
+        historySettings.setValue("history","[]");
+        getHistory();
     }
 
 
     function deleteHistory(index){
-        var list =historySettings.value("history",[])
+        var list = historySettings.value("history",[])
         if(list.length<index+1)return
         list.splice(index,1)
         historySettings.setValue("history",list)

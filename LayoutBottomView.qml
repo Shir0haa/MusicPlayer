@@ -289,7 +289,7 @@ Rectangle{
         //获取播放链接
         getUrl(index)
 
-        }
+    }
 
     function getUrl(index){
         //播放
@@ -495,7 +495,9 @@ Rectangle{
         }
         //保存到Settings
         try {
-            historySettings.setValue("history", history)
+            historySettings.setValue("history", JSON.stringify(history));
+            //修改history存储结构，实现和favorites统一
+            //historySettings.setValue("history", history)
             console.log("History saved successfully")
             return true
         } catch (e) {

@@ -78,7 +78,7 @@ Item {
                         background.color = pressed ? "#50000000" : "#00000000"
                     }
 
-                    // 点击事件（可根据需要自定义行为）
+                    // 点击事件
                     onTapped: {
                         console.log("点击专辑:", modelData.album.name)
                         layoutBottomView.current = -1

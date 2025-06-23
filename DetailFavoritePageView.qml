@@ -65,7 +65,7 @@ ColumnLayout{
 
     function clearFavorite()    //清空记录
     {
-        favoriteSettings.setValue("favorite",[])
+        favoriteSettings.setValue("favorite","[]")
         getFavorite()
     }
 

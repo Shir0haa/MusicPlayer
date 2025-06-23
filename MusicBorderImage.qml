@@ -5,7 +5,7 @@ import QtQuick.Layouts
 Rectangle {
     id: root
 
-    property string imgSrc: "qrc:/images/player"
+    property string imgSrc: "qrc:/images/cat"
     property int borderRadius: 5
     property bool isRotating: false
     property real rotationAngle: 0.0
