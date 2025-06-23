@@ -11,6 +11,47 @@ Frame {
     Layout.fillHeight: true
     padding: 0
 
+    // 复用本地音乐页面的文件处理函数
+    function processSelectedFiles(selectedFiles) {
+        var list = []
+        for (var i = 0; i < selectedFiles.length; i++) {
+            var path = selectedFiles[i].toString()
+            var lyrics = metaReader.getLyrics ? metaReader.getLyrics(path) : ""
+
+            // 从 C++ 获取真实音乐信息
+            var meta = metaReader.getFileInfo(path)
+            var name = meta.title || "未知"
+            var artist = meta.artist || "未知"
+            var album = meta.album || "本地音乐"
+
+            // 当歌曲名为"未知"时，尝试从文件名解析
+            if (name === "未知") {
+                var arr = path.split("/")
+                var fileName = arr[arr.length - 1]
+                var fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."))
+
+                var nameArr = fileNameWithoutExt.split("-")
+                if (nameArr.length > 1) {
+                    name = nameArr[0].trim()
+                } else {
+                    name = fileNameWithoutExt
+                }
+            }
+
+            list.push({
+                id: path,
+                name: name,
+                artist: artist,
+                album: album,
+                url: path,
+                type: "1",
+                lyrics: lyrics,
+                cover: "qrc:/images/default-cover.png"
+            })
+        }
+        return list
+    }
+
     // 歌单数据
     property var playLists: []
     property int currentPlayListIndex: -1
@@ -34,7 +75,7 @@ Frame {
             console.error("加载歌单失败:", e)
             playLists = []
         }
-        playListComboBox.model = playLists  // 更新下拉框
+        playListComboBox.model = playLists
     }
 
     // 更新音乐列表视图
@@ -49,7 +90,7 @@ Frame {
     // 保存歌单数据
     function savePlayLists() {
         localSettings.setValue("playLists", JSON.stringify(playLists))
-        loadPlayLists()  // 保存后刷新数据
+        loadPlayLists()
     }
 
     // 创建新歌单
@@ -89,12 +130,10 @@ Frame {
             return 0
         }
 
-        // 确保songs数组存在
         if (!playLists[currentPlayListIndex].songs) {
             playLists[currentPlayListIndex].songs = []
         }
 
-        // 去重检查
         var existingIds = playLists[currentPlayListIndex].songs.map(song => song.id)
         var newSongs = songs.filter(song => song && song.id && !existingIds.includes(song.id))
 
@@ -105,8 +144,6 @@ Frame {
 
         playLists[currentPlayListIndex].songs = playLists[currentPlayListIndex].songs.concat(newSongs)
         savePlayLists()
-
-        // 更新当前视图
         updateMusicListView()
 
         return newSongs.length
@@ -158,40 +195,16 @@ Frame {
         onAccepted: deleteCurrentPlayList()
     }
 
-    // 添加本地歌曲对话框
+    // 复用本地音乐页面的文件对话框组件
     FileDialog {
         id: fileDialog
-        title: "选择音乐文件"
-        nameFilters: ["音乐文件 (*.mp3 *.wav *.flac *.ogg *.aac)"]
+        title: "选择本地音乐文件"
         fileMode: FileDialog.OpenFiles
+        nameFilters: ["MP3 (*.mp3)", "FLAC (*.flac)", "WAV (*.wav)"]
+        currentFolder: StandardPaths.standardLocations(StandardPaths.MusicLocation)[0]
 
         onAccepted: {
-            var songsToAdd = []
-            for (var i = 0; i < selectedFiles.length; i++) {
-                var filePath = selectedFiles[i].toString()
-                // 修复Windows路径问题
-                if (Qt.platform.os === "windows") {
-                    filePath = filePath.replace(/^file:\/\//, "")
-                } else {
-                    filePath = filePath.replace(/^file:\/\//, "/")
-                }
-
-                var fileName = filePath.substring(filePath.lastIndexOf('/') + 1)
-                var dotIndex = fileName.lastIndexOf('.')
-                var songName = dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName
-                var fileExtension = dotIndex > 0 ? fileName.substring(dotIndex + 1).toLowerCase() : ""
-
-                songsToAdd.push({
-                    id: "local-" + Date.now() + "-" + i,
-                    name: songName,
-                    artist: "未知艺术家",
-                    album: "未知专辑",
-                    url: filePath,
-                    type: fileExtension,
-                    source: "local"
-                })
-            }
-
+            var songsToAdd = processSelectedFiles(selectedFiles)
             var addedCount = addSongsToCurrentPlayList(songsToAdd)
             if (addedCount > 0) {
                 showMessage("成功添加 " + addedCount + " 首歌曲到歌单")
@@ -266,30 +279,6 @@ Frame {
                     text: "创建时间: " + (currentPlayList ? new Date(currentPlayList.createTime).toLocaleDateString() : "")
                     font.pixelSize: 14
                     color: "#AAAAAA"
-                }
-
-                RowLayout {
-                    spacing: 10
-
-                    Button {
-                        text: "播放全部"
-                        implicitWidth: 100
-                        enabled: currentPlayList && currentPlayList.songs.length > 0
-                        onClicked: {
-                            layoutBottomView.playList = currentPlayList.songs
-                            layoutBottomView.current = 0
-                        }
-                    }
-
-                    Button {
-                        text: "随机播放"
-                        implicitWidth: 100
-                        enabled: currentPlayList && currentPlayList.songs.length > 0
-                        onClicked: {
-                            layoutBottomView.playList = currentPlayList.songs
-                            layoutBottomView.current = Math.floor(Math.random() * currentPlayList.songs.length)
-                        }
-                    }
                 }
             }
         }

@@ -82,16 +82,7 @@ Frame{
                         y:45
                     }
                 }
-            }//在列表项底部绘制一条分隔线
-
-            // property bool hovered: false
-
-            // MouseArea{
-            //     anchors.fill: parent
-            //     hoverEnabled: true
-            //     cursorShape: Qt.PointingHandCursor  //鼠标悬停时显示为手型
-            //     onEntered: hovered = true
-            //     onExited: hovered = false
+            }
 
                 RowLayout{
                     width: parent.width
@@ -139,10 +130,7 @@ Frame{
                                 iconWidth: 16
                                 toolTip: "播放"
                                 onClicked: {
-                                    // playMusic(index)
                                     layoutBottomView.playList = musicList
-                                    // layoutBottomView.playMusic(index)
-                                    // layoutBottomView.current = -1                // 重置当前播放索引
                                     layoutBottomView.playList = musicList        // 设置播放列表
                                     layoutBottomView.current = index             // 播放当前项
                                 }
@@ -192,13 +180,6 @@ Frame{
                         listViewDelegateItem.ListView.view.currentIndex = index
                     }
                 }
-
-
-                // onClicked: {
-                //     listViewDelegateItem.ListView.view.currentIndex = index // 选中当前项
-                // }
-
-            // }
         }
     }
 
