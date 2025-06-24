@@ -18,8 +18,8 @@ Window {
     title: qsTr("鸟白岛音乐播放器")
 
     HttpUtils{
-          id:http
-      }
+        id:http
+    }
 
     Component.onCompleted: {
         //testHttp()
@@ -56,6 +56,11 @@ Window {
         onPositionChanged: function(position) {
             //控制底部进度条 同步显示音乐进度
             layoutBottomView.setSlider(0, duration, position)
+
+            if(times.length>0){
+                var count = times.filter(time=>time<position).length
+                pageDetailView.current  = (count===0)?0:count-1
+            }
         }
 
         audioOutput: audioOutput
@@ -74,28 +79,28 @@ Window {
     ColumnLayout{
         anchors.fill: parent
         //添加顶部工具栏
-       spacing: 0
-       LayoutHeaderView{
-           id:layoutHeaderView
+        spacing: 0
+        LayoutHeaderView{
+            id:layoutHeaderView
 
-       }
-       PageHomeView{
-           id:pageHomeView
+        }
+        PageHomeView{
+            id:pageHomeView
 
-       }
-       PageDetailView{
-                   id:pageDetailView
-                   visible: false
-       }
+        }
+        PageDetailView{
+            id:pageDetailView
+            visible: false
+        }
 
-       //底部工具栏
-       LayoutBottomView{
-           id:layoutBottomView
-           //传入mediaPlayer
-           // mediaPlayer: mediaPlayer
+        //底部工具栏
+        LayoutBottomView{
+            id:layoutBottomView
+            //传入mediaPlayer
+            // mediaPlayer: mediaPlayer
 
-       }
-      }
+        }
+    }
 
 }
 

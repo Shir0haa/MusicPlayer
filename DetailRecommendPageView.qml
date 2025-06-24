@@ -78,6 +78,7 @@ ScrollView {
     }
     Component.onCompleted: {
         getBannerList()
+        // getHotList()
     }
 
     //js 从网络导入数据
@@ -109,6 +110,8 @@ ScrollView {
             getLatestList()
         }
         http.onReplySignal.connect(onReply) //绑定到c++的replay
+        // http.connect("v1/personalized")
+
         http.connect("top/playlist/highquality?limit=20")
     }
 

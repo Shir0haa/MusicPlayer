@@ -12,35 +12,67 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Widgets)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TAGLIB REQUIRED taglib)
 
-set(PROJECT_SOURCES main.cpp qml.qrc)
+
+set(PROJECT_SOURCES
+    main.cpp
+    qml.qrc
+    httputils.cpp
+    filemetareader.cpp
+    startAPIServer.cpp
+)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(ShirohaPlayer MANUAL_FINALIZATION ${PROJECT_SOURCES}
-                    images.qrc httputils.h httputils.cpp
-                    filemetareader.h filemetareader.cpp)
-  # Define target properties for Android with Qt 6 as: set_property(TARGET
-  # ShirohaPlayer APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-  # ${CMAKE_CURRENT_SOURCE_DIR}/android) For more information, see
-  # https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+  qt_add_executable(ShirohaPlayer MANUAL_FINALIZATION
+                    ${PROJECT_SOURCES}
+                    images.qrc
+                    httputils.h
+                    filemetareader.h
+                    startAPIServer.h)
 else()
   if(ANDROID)
     add_library(ShirohaPlayer SHARED ${PROJECT_SOURCES})
-    # Define properties for Android with Qt 5 after find_package() calls as:
-    # set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
   else()
     add_executable(ShirohaPlayer ${PROJECT_SOURCES})
   endif()
 endif()
 
-target_include_directories(ShirohaPlayer PRIVATE ${TAGLIB_INCLUDE_DIRS})
+# 添加头文件包含路径
+target_include_directories(ShirohaPlayer PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${TAGLIB_INCLUDE_DIRS}
+)
+
+# 添加 Qt Widgets 模块
 target_link_libraries(
-  ShirohaPlayer PRIVATE Qt${QT_VERSION_MAJOR}::Core
-                        Qt${QT_VERSION_MAJOR}::Quick ${TAGLIB_LIBRARIES})
+  ShirohaPlayer PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Quick
+    Qt${QT_VERSION_MAJOR}::Widgets  # 添加 Widgets 模块
+    ${TAGLIB_LIBRARIES}
+)
+
+# 复制 API 目录到构建目录
+add_custom_command(TARGET ShirohaPlayer POST_BUILD
+   COMMAND ${CMAKE_COMMAND} -E copy_directory
+       ${CMAKE_CURRENT_SOURCE_DIR}/api
+       $<TARGET_FILE_DIR:ShirohaPlayer>/api
+   COMMENT "Copying API directory to build folder"
+)
+
+# 设置可执行权限（仅 Linux）
+if(UNIX)
+   add_custom_command(TARGET ShirohaPlayer POST_BUILD
+       COMMAND chmod +x $<TARGET_FILE_DIR:ShirohaPlayer>/api/netease_api
+       COMMENT "Setting executable permissions for API"
+   )
+endif()
+
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1. If
 # you are developing for iOS or macOS you should consider setting an explicit,
 # fixed bundle identifier manually though.

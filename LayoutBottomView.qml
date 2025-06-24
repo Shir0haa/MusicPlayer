@@ -16,6 +16,8 @@ Rectangle{
     property var playList: []
     property int current: -1
 
+    property var loca_wabl_lyric: []
+
 
     property int currentPlayMode: 0
     //三种播放模式
@@ -260,11 +262,24 @@ Rectangle{
         //获取播放链接
         if(playList[current].type==="1"){
             //播放本地音乐
+            // local_lyric = true
+            // web_lyric = false
+            pageDetailView.lyricView.visible = false
+            pageDetailView.textItem.visible = true
             playLocalMusic()
+
         }
         else
             //播放网络音乐
+        {
+            // local_lyric = false
+            // web_lyric = true
+            pageDetailView.lyricView.visible = true
+            pageDetailView.textItem.visible = false
+
             playWebMusic()
+
+        }
         saveHistory(current)//保存播放历史
     }
     function playLocalMusic() {
@@ -315,6 +330,7 @@ Rectangle{
                 getCover(id)
             }else{
                 musicCover = cover
+                getLyric(id)
                 // musicCover.imgSrc = cover
             }
             musicName = playList[index].name
@@ -328,9 +344,12 @@ Rectangle{
         http.connect("song/url?id="+id)
     }
 
+    //获取封面
     function getCover(id){
         function onReply(reply){
             http.onReplySignal.disconnect(onReply)
+
+            getLyric(id)
 
             var song = JSON.parse(reply).songs[0]
             var cover = song.al.picUrl
@@ -347,6 +366,62 @@ Rectangle{
         }
         http.onReplySignal.connect(onReply)
         http.connect("song/detail?ids="+id)
+    }
+
+
+    function getLyric(id){
+        function onReply(reply){
+            http.onReplySignal.disconnect(onReply)
+
+            var lyric = JSON.parse(reply).lrc.lyric
+            // console.log(lyric)
+
+
+            if(lyric.length < 0)
+                return
+
+            //
+            var lyrics = (lyric.replace(/\[.*\]/gi,"")).split("\n")
+
+            if(lyrics.length>0) pageDetailView.lyricsList = lyrics
+
+            var times = []
+
+            lyric.replace(/\[.*\]/gi,function(match,index){
+                //match : [00:00.00]
+                if(match.length>2){
+                    var time  = match.substr(1,match.length-2)
+                    var arr = time.split(":")
+                    var timeValue = arr.length>0? parseInt(arr[0])*60*1000:0
+                    arr = arr.length>1?arr[1].split("."):[0,0]
+                    timeValue += arr.length>0?parseInt(arr[0])*1000:0
+                    timeValue += arr.length>1?parseInt(arr[1])*10:0
+
+                    times.push(timeValue)
+                }
+            })
+
+            mediaPlayer.times = times
+
+
+            // var cover = song.al.picUrl
+            // var cover = JSON.parse(reply).songs[0].al.picUrl
+            // if(cover){
+            //     //修改了cover,让search的也可以显示
+            //     musicCover = cover
+            //     if(musicName.length<1)musicName = song.name
+            //     if(musicArtist.length<1)musicArtist = song.ar[0].name
+            // musicCover.imgSrc = url
+            // coverBase64  = musicCover.imgSrc
+            // }
+            // coverBase64 = url
+        }
+
+        // mediaPlayer.times = times
+
+
+        http.onReplySignal.connect(onReply)
+        http.connect("lyric?id="+id)
     }
 
 
@@ -473,7 +548,8 @@ Rectangle{
         //获取现有历史记录
         var history = []
         try {
-            history = historySettings.value("history", [])
+            var stored = historySettings.value("history", "[]")
+            history = JSON.parse(stored)
             if (!Array.isArray(history)) {
                 console.warn("History data is not array, resetting")
                 history = []

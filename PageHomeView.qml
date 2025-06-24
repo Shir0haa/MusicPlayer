@@ -107,16 +107,21 @@ RowLayout {
                 }
             }
         }
-
         // 初始化菜单数据
         Component.onCompleted: {
 
 
             menuViewModel.append(qmlList.filter(item => item.menu))
             // menuViewModel.append(qmlList)
-            var loader = repeater.itemAt(0)
-            loader.visible=true
-            loader.source = qmlList[0].qml+".qml"
+
+            //默认加载推荐界面，但是api服务加载可能会慢，导致推荐界面没有加载
+            //使用定时器也一样，所以还是人为点击，不默认加载
+
+            // api_time.start()
+
+            // var loader = repeater.itemAt(2)
+            // loader.visible=true
+            // loader.source = qmlList[0].qml+".qml"
 
             // showPlayList()
 
@@ -129,6 +134,12 @@ RowLayout {
             // }
         }
     }
+
+    // Timer{
+    //     id:api_time
+    //     interval: 1000
+    //     running: true
+    // }
 
 
     Repeater{

@@ -8,6 +8,14 @@ Item {
     Layout.fillWidth: true
     Layout.fillHeight: true
 
+    property alias lyricView: lyricView
+    property alias textItem: textItem
+
+
+    property alias lyricsList : lyricView.lyrics
+
+    property alias current : lyricView.current
+
     property var currentItem: ({})
 
 
@@ -88,6 +96,13 @@ Item {
             padding: 0
             background: Rectangle { color: "transparent" }
 
+
+            MusicLyricView{
+                         id:lyricView
+                         anchors.fill: parent
+                         visible:  false
+                     }
+
             Flickable {
                 anchors.fill: parent
                 contentWidth: width
@@ -101,6 +116,7 @@ Item {
                     id: textItem
                     width: parent.width
                     text: currentItem.lyrics || "当前歌曲暂无歌词"
+                    visible:  true
                     color: "black"
                     wrapMode: Text.Wrap
                     horizontalAlignment: Text.AlignHCenter
