@@ -4,7 +4,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCore
 import QtMultimedia
-import MyUtils
 
 Window {
     id:window
@@ -16,14 +15,6 @@ Window {
     height: 800
     visible: true
     title: qsTr("鸟白岛音乐播放器")
-
-    HttpUtils{
-        id:http
-    }
-
-    Component.onCompleted: {
-        //testHttp()
-    }
 
 
     Settings

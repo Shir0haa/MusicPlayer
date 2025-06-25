@@ -17,8 +17,6 @@ int main(int argc, char *argv[])
     // 启动 API 服务
     startAPIServer(&app);
 
-    //参数：qmlRegisterType<C++类型名> (命名空间 主版本 次版本 QML中的类型名)
-    qmlRegisterType<HttpUtils>("MyUtils" ,1 ,0 ,"HttpUtils");   //注册到qml
 
     app.setWindowIcon(QIcon(":/images/cat"));
 
@@ -27,7 +25,22 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("myorg.com");
     QCoreApplication::setApplicationName("ShirohaPlayer");
 
+    HttpUtils *httpUtils = new HttpUtils(&app);
+
+
+    // 注册到qml,之前使用的qmlRegisterType,还需要在main.qml只能够import,现在就可以不用import，在QML中作为全局对象
+
+
+    FileMetaReader metaReader;
+
     QQmlApplicationEngine engine;
+
+    engine.rootContext()->setContextProperty("http", httpUtils);
+
+    engine.rootContext()->setContextProperty("metaReader", &metaReader);
+
+
+
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(
         &engine,
@@ -39,9 +52,6 @@ int main(int argc, char *argv[])
         },
         Qt::QueuedConnection);
     engine.load(url);
-
-    FileMetaReader metaReader;
-    engine.rootContext()->setContextProperty("metaReader", &metaReader);
 
     return app.exec();
 }

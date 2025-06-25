@@ -4,7 +4,11 @@ HttpUtils::HttpUtils(QObject *parent)
     : QObject{parent}
 {
     manager = new QNetworkAccessManager(this); //创建manager成员对象
-    QObject::connect(manager , SIGNAL(finished(QNetworkReply*)) , this , SLOT(replayFinished(QNetworkReply*)));
+
+
+    //连接信号与槽
+    QObject::connect(manager, &QNetworkAccessManager::finished,
+                     this, &HttpUtils::replayFinished);
 
 }
 
