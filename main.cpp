@@ -5,7 +5,7 @@
 #include <QQmlContext>
 #include "filemetareader.h"
 #include "startAPIServer.h"
-
+#include "fileio.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/images/cat"));
 
     // 自定义
+    //设置组织名和域名，确保Settings能够正常工作
     QCoreApplication::setOrganizationName("MyOrg");
     QCoreApplication::setOrganizationDomain("myorg.com");
     QCoreApplication::setApplicationName("ShirohaPlayer");
@@ -30,10 +31,13 @@ int main(int argc, char *argv[])
 
     // 注册到qml,之前使用的qmlRegisterType,还需要在main.qml只能够import,现在就可以不用import，在QML中作为全局对象
 
+    FileIO fileIo;
 
     FileMetaReader metaReader;
 
     QQmlApplicationEngine engine;
+
+    engine.rootContext()->setContextProperty("fileIo", &fileIo);
 
     engine.rootContext()->setContextProperty("http", httpUtils);
 

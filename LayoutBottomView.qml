@@ -259,13 +259,21 @@ Rectangle{
     function playMusic(){
         if(current<0)return
         if(playList.length<current+1) return
+
+        var currentItem = playList[current]
         //获取播放链接
         if(playList[current].type==="1"){
             //播放本地音乐
-            // local_lyric = true
-            // web_lyric = false
-            pageDetailView.lyricView.visible = false
-            pageDetailView.textItem.visible = true
+            //pageDetailView.lyricView.visible = false
+            //pageDetailView.textItem.visible = true
+
+            var parsed = parseLrc(currentItem.lyrics || "")
+            pageDetailView.lyricView.lyrics = parsed.lyricsArray.length > 0 ? parsed.lyricsArray : ["暂无歌词"]
+            pageDetailView.lyricView.times = parsed.timesArray
+
+
+            //var currentItem = playList[current]
+            //pageDetailView.updateLyrics(currentItem.url)
             playLocalMusic()
 
         }
@@ -274,8 +282,8 @@ Rectangle{
         {
             // local_lyric = false
             // web_lyric = true
-            pageDetailView.lyricView.visible = true
-            pageDetailView.textItem.visible = false
+            //pageDetailView.lyricView.visible = true
+            //pageDetailView.textItem.visible = false
 
             playWebMusic()
 
@@ -297,7 +305,76 @@ Rectangle{
         // musicCover.imgSrc = coverBase64 !== "" ? coverBase64 : "qrc:/images/cat"
 
 
+        // 解析本地歌词，传递给歌词组件
+        var parsed = parseLrc(currentItem.lyrics || "")
+                pageDetailView.lyricView.lyrics = parsed.lyricsArray.length > 0 ? parsed.lyricsArray : ["暂无歌词"]
+                pageDetailView.lyricView.times = parsed.timesArray
+
+
+
+        mediaPlayer.times = parsed.timesArray
+        //  // 绑定进度同步
+        // mediaPlayer.positionChanged.connect(function() {
+        //     pageDetailView.lyricView.position = mediaPlayer.position
+        // })
+
+
     }
+
+    function parseLrc(lyricsText) {
+        var lines = lyricsText.split('\n')
+        var parsed = []
+
+        var timeReg = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\]/g
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i]
+            var result
+            var timesInLine = []
+
+            // 提取所有时间标签
+            while ((result = timeReg.exec(line)) !== null) {
+                var min = parseInt(result[1])
+                var sec = parseInt(result[2])
+                var msec = result[3] ? parseInt(result[3]) : 0
+                if (result[3] && result[3].length === 2) {
+                    msec *= 10
+                }
+                var timeMs = min * 60 * 1000 + sec * 1000 + msec
+                timesInLine.push(timeMs)
+            }
+
+            // 提取歌词内容（剥离所有时间标签）
+            var text = line.replace(/\[[^\]]+\]/g, '').trim()
+            if (text.length === 0) continue  // 忽略空行
+
+            for (var j = 0; j < timesInLine.length; j++) {
+                parsed.push({ time: timesInLine[j], text: text })
+            }
+        }
+
+        // 按时间升序排序
+        parsed.sort(function(a, b) {
+            return a.time - b.time
+        })
+
+        // 拆分为两个数组
+        var lyricsArray = []
+        var timesArray = []
+
+        for (var k = 0; k < parsed.length; k++) {
+            lyricsArray.push(parsed[k].text)
+            timesArray.push(parsed[k].time)
+        }
+
+        return {
+            lyricsArray: lyricsArray,
+            timesArray: timesArray
+        }
+    }
+
+
+
 
 
     function playWebMusic(index =  current){
@@ -402,7 +479,6 @@ Rectangle{
             })
 
             mediaPlayer.times = times
-
 
             // var cover = song.al.picUrl
             // var cover = JSON.parse(reply).songs[0].al.picUrl

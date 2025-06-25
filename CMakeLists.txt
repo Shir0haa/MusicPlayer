@@ -32,7 +32,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
                     images.qrc
                     httputils.h
                     filemetareader.h
-                    startAPIServer.h)
+                    startAPIServer.h
+                    fileio.h fileio.cpp)
 else()
   if(ANDROID)
     add_library(ShirohaPlayer SHARED ${PROJECT_SOURCES})

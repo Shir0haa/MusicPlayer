@@ -77,7 +77,21 @@ ColumnLayout {
 
 
                 var path = selectedFiles[i].toString()
-                var lyrics = metaReader.getLyrics ? metaReader.getLyrics(path) : ""
+
+                // 自动查找同目录下的 .lrc 文件（替换 .mp3 为 .lrc）
+                var lrcPath = path.replace(/\.\w+$/, ".lrc")
+                var localLrcPath = lrcPath.startsWith("file://") ? lrcPath.replace("file://", "") : lrcPath
+
+                console.log("转换后歌词路径：" + localLrcPath)
+                console.log("歌词文件存在吗？", fileIo.exists(localLrcPath))
+
+                if (fileIo.exists(localLrcPath)) {
+                    var lyrics = fileIo.readAll(localLrcPath)
+                    console.log("读取歌词内容：", lyrics)
+                } else {
+                    console.log("未导入歌词：" + localLrcPath)
+                }
+
 
                 // 从 C++ 获取真实音乐信息
                 var meta = metaReader.getFileInfo(path)

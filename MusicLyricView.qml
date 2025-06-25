@@ -15,6 +15,9 @@ Rectangle {
     // 居中对齐
     Layout.alignment: Qt.AlignCenter
 
+    property var times: []
+
+
     // 启用裁剪，防止内容溢出
     clip: true
 

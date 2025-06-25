@@ -7,7 +7,6 @@
 #include <taglib/flacfile.h>
 #include <taglib/wavfile.h>
 #include <QFileInfo>
-
 #include <QBuffer>
 #include <QImage>
 #include <QDebug>
@@ -153,47 +152,56 @@ QByteArray FileMetaReader::extractCoverImage(
 
 //提取音乐文件内嵌歌词
 //测试过很多mp3文件，都没有内嵌歌词，该功能暂时不继续深入
-QString FileMetaReader::getLyrics(
-    const QString &filePath)
-{
-    QString localPath = QUrl(filePath).toLocalFile();
-    QString suffix = QFileInfo(localPath).suffix().toLower();
 
-    if (suffix == "mp3") {
-        TagLib::MPEG::File file(localPath.toUtf8().constData());
-        if (file.isValid()) {
-            auto *tag = file.ID3v2Tag();
-            if (tag) {
-                // 优先尝试 USLT
-                auto usltFrames = tag->frameList("USLT");
-                if (!usltFrames.isEmpty()) {
-                    auto *frame = dynamic_cast<TagLib::ID3v2::TextIdentificationFrame *>(
-                        usltFrames.front());
-                    if (frame)
-                        return QString::fromStdWString(frame->toString().toWString());
-                }
+//不再通过解析内嵌歌词，而是使用同名的.irc文件来获取对应歌曲的歌词
 
-                // 兼容 TXXX:LYRICS（部分写入工具使用该格式）
-                auto frames = tag->frameList("TXXX");
-                for (auto *f : frames) {
-                    auto *textFrame = dynamic_cast<TagLib::ID3v2::UserTextIdentificationFrame *>(f);
-                    if (textFrame
-                        && QString::fromStdWString(textFrame->description().toWString()).toLower()
-                               == "lyrics") {
-                        return QString::fromStdWString(
-                            textFrame->fieldList().toString().toWString());
-                    }
-                }
-            }
-        }
-    } else if (suffix == "flac") {
-        TagLib::FLAC::File file(localPath.toUtf8().constData());
-        if (file.isValid()) {
-            auto tag = file.xiphComment();
-            if (tag && tag->contains("LYRICS"))
-                return QString::fromStdWString(tag->fieldListMap()["LYRICS"].toString().toWString());
-        }
-    }
+// QString FileMetaReader::getLyrics(
+//     const QString &filePath)
+// {
+//     QString localPath = QUrl(filePath).toLocalFile();
+//     QString suffix = QFileInfo(localPath).suffix().toLower();
 
-    return "";
-}
+//     if (suffix == "mp3") {
+//         TagLib::MPEG::File file(localPath.toUtf8().constData());
+//         if (file.isValid()) {
+//             auto *tag = file.ID3v2Tag();
+//             if (tag) {
+//                 // 优先尝试 USLT
+//                 auto usltFrames = tag->frameList("USLT");
+//                 if (!usltFrames.isEmpty()) {
+//                     auto *frame = dynamic_cast<TagLib::ID3v2::TextIdentificationFrame *>(
+//                         usltFrames.front());
+//                     if (frame)
+//                         return QString::fromStdWString(frame->toString().toWString());
+//                 }
+
+//                 auto frames = tag->frameList("TXXX");
+//                 for (auto *f : frames) {
+//                     auto *textFrame = dynamic_cast<TagLib::ID3v2::UserTextIdentificationFrame *>(f);
+//                     if (textFrame) {
+//                         QString desc = QString::fromStdWString(textFrame->description().toWString())
+//                                            .toLower();
+//                         QString content = QString::fromStdWString(
+//                             textFrame->fieldList().toString().toWString());
+
+//                         // 打印调试
+//                         qDebug() << "TXXX Frame:" << desc << content;
+
+//                         if (desc.contains("lyrics") || desc.contains("lyric") || desc == "歌词") {
+//                             return content;
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     } else if (suffix == "flac") {
+//         TagLib::FLAC::File file(localPath.toUtf8().constData());
+//         if (file.isValid()) {
+//             auto tag = file.xiphComment();
+//             if (tag && tag->contains("LYRICS"))
+//                 return QString::fromStdWString(tag->fieldListMap()["LYRICS"].toString().toWString());
+//         }
+//     }
+
+//     return "";
+// }

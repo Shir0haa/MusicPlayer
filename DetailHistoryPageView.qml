@@ -66,12 +66,21 @@ ColumnLayout{
     }
 
 
+
     function deleteHistory(index){
-        var list = historySettings.value("history",[])
-        if(list.length<index+1)return
-        list.splice(index,1)
-        historySettings.setValue("history",list)
+        var list = []
+        try {
+            list = JSON.parse(historySettings.value("history", "[]"))
+        } catch(e) {
+            console.error("历史记录解析失败：", e)
+            return
+        }
+        if (index < 0 || index >= list.length) return
+
+        list.splice(index, 1)
+        historySettings.setValue("history", JSON.stringify(list))
         getHistory()
     }
+
 
 }
