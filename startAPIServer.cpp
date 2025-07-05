@@ -1,5 +1,5 @@
 #include "startAPIServer.h"
-#include <QApplication>  // 现在在.cpp文件中包含
+#include <QApplication>
 #include <QFile>
 #include <QDebug>
 #include <QTimer>
